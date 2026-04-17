@@ -1,53 +1,85 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.3.4'
-    id 'io.spring.dependency-management' version '1.1.6'
-    id 'com.diffplug.spotless' version '7.0.2'
+  id 'java'
+  id 'org.springframework.boot' version '3.3.4'
+  id 'io.spring.dependency-management' version '1.1.6'
+  id 'com.diffplug.spotless' version '7.0.2'
+  id 'checkstyle'
 }
 
 group = 'com.mobo'
 version = '0.0.1-SNAPSHOT'
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
 }
 
 repositories {
-    mavenCentral()
+  mavenCentral()
+}
+
+ext {
+  mapstructVersion = '1.5.5.Final'
+  jjwtVersion = '0.12.6'
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.flywaydb:flyway-core'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-    compileOnly 'org.projectlombok:lombok:1.18.34'
+  // Spring Boot starters
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-validation'
+  implementation 'org.springframework.boot:spring-boot-starter-security'
 
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-    annotationProcessor 'org.projectlombok:lombok:1.18.34'
-    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+  // Flyway
+  implementation 'org.flywaydb:flyway-core'
+  implementation 'org.flywaydb:flyway-database-postgresql'
 
-    runtimeOnly 'org.postgresql:postgresql'
+  // PostgreSQL driver
+  runtimeOnly 'org.postgresql:postgresql'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testCompileOnly 'org.projectlombok:lombok:1.18.34'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+  // MapStruct
+  implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+
+  // Jackson
+  implementation 'com.fasterxml.jackson.core:jackson-databind'
+  implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+  // JJWT
+  implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+  runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+  runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+
+  // Lombok
+  compileOnly 'org.projectlombok:lombok'
+
+  // Test dependencies
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.mockito:mockito-core'
+  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+  // Annotation processors (order matters: lombok → binding → mapstruct)
+  annotationProcessor 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+  annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 }
 
 spotless {
-    java {
-        target 'src/*/java/**/*.java'
-        googleJavaFormat()
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
+  java {
+    target 'src/*/java/**/*.java'
+    googleJavaFormat()
+    removeUnusedImports()
+    trimTrailingWhitespace()
+    endWithNewline()
+  }
 }
 
-tasks.withType(Test).configureEach {
-    useJUnitPlatform()
+checkstyle {
+  toolVersion = '10.17.0'
+  configFile = file('config/checkstyle/google_checks.xml')
+  checkstyleTest.enabled = false
+}
+
+tasks.named('test') {
+  useJUnitPlatform()
 }
