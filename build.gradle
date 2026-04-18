@@ -22,6 +22,13 @@ repositories {
 ext {
   mapstructVersion = '1.5.5.Final'
   jjwtVersion = '0.12.6'
+  testcontainersVersion = '1.20.4'
+}
+
+dependencyManagement {
+  imports {
+    mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
+  }
 }
 
 dependencies {
@@ -55,7 +62,11 @@ dependencies {
 
   // Test dependencies
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.springframework.boot:spring-boot-testcontainers'
   testImplementation 'org.mockito:mockito-core'
+  testImplementation 'com.tngtech.archunit:archunit-junit5:1.3.0'
+  testImplementation 'org.testcontainers:junit-jupiter'
+  testImplementation 'org.testcontainers:postgresql'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
   // Annotation processors (order matters: lombok → binding → mapstruct)
@@ -82,4 +93,7 @@ checkstyle {
 
 tasks.named('test') {
   useJUnitPlatform()
+  // Docker 25+ rejects docker-java's default API version; pin to a supported one.
+  environment 'DOCKER_API_VERSION', '1.45'
+  systemProperty 'api.version', '1.45'
 }
