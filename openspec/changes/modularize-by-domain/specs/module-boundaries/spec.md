@@ -57,7 +57,7 @@ A class in module `A` MUST NOT import from another module `B`'s `persistence`, `
 
 #### Scenario: Legal cross-module call via api
 
-- **WHEN** `com.mobo.brands.service.impl.BrandDomainServiceImpl` needs data owned by the `orders` module
+- **WHEN** `impl.service.brands.com.coddicted.buzzma.BrandDomainServiceImpl` needs data owned by the `orders` module
 - **THEN** it SHALL depend on an interface in `com.mobo.orders.api` (e.g. `OrderQueryPort`), and SHALL NOT import `com.mobo.orders.persistence.*` or `com.mobo.orders.service.*`
 
 #### Scenario: Illegal cross-module reach-in is rejected
@@ -91,11 +91,11 @@ The test suite SHALL include an ArchUnit (or equivalent architecture-test librar
 #### Scenario: ArchUnit test runs in CI
 
 - **WHEN** `./gradlew test` is executed
-- **THEN** the test class `com.mobo.architecture.ModuleBoundaryTest` (or equivalent) SHALL be executed and all its `@ArchTest` rules SHALL pass
+- **THEN** the test class `architecture.com.coddicted.buzzma.ModuleBoundaryTest` (or equivalent) SHALL be executed and all its `@ArchTest` rules SHALL pass
 
 #### Scenario: Introducing a reach-in fails CI
 
-- **WHEN** a developer adds an import of `com.mobo.orders.persistence.OrdersRepository` inside a class in `com.mobo.brands.**`
+- **WHEN** a developer adds an import of `persistence.orders.com.coddicted.buzzma.OrdersRepository` inside a class in `com.mobo.brands.**`
 - **THEN** `./gradlew test` SHALL fail with a violation message naming the illegal dependency
 
 ### Requirement: Behavioral preservation

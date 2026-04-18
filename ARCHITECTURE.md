@@ -19,7 +19,7 @@ The codebase is a single Spring Boot application organized into twelve domain mo
 | `notifications` | Push subscriptions                                                             |
 | `shared`        | Cross-cutting primitives: common base types, security config, exceptions, enums, health endpoint |
 
-A thirteenth top-level class, `com.mobo.JavaBackendApplication`, sits at the `com.mobo` root as the Spring Boot entry point.
+A thirteenth top-level class, `com.coddicted.buzzma.BuzzmaBackendApplication`, sits at the `com.mobo` root as the Spring Boot entry point.
 
 ## Package convention inside each module
 
@@ -46,8 +46,8 @@ Everything else — `persistence`, `service`, `service.impl`, `web`, `mapper`, `
 
 This boundary is enforced by `src/test/java/com/mobo/architecture/ModuleBoundaryTest.java` (ArchUnit). The test has seven rules covering module residence, persistence/web/mapper placement, and cross-module reach-ins. Two framework-wiring classes are whitelisted because they cannot be expressed as DTO-only ports:
 
-- `com.mobo.shared.security.SecurityConfig` — wires `JwtAuthenticationFilter` (identity) and `UpstreamSuspensionFilter` (mediator) into the filter chain.
-- `com.mobo.mediator.security.UpstreamSuspensionFilter` — reads `MoboUserDetails` (identity) to enforce downstream-suspension propagation.
+- `security.shared.com.coddicted.buzzma.SecurityConfig` — wires `JwtAuthenticationFilter` (identity) and `UpstreamSuspensionFilter` (mediator) into the filter chain.
+- `security.mediator.com.coddicted.buzzma.UpstreamSuspensionFilter` — reads `MoboUserDetails` (identity) to enforce downstream-suspension propagation.
 
 When a boundary violation is legitimate (new framework-wiring), add the fully-qualified class name to `CROSS_MODULE_IMPORT_WHITELIST` in the boundary test with a one-line justification. When it is illegitimate (a missed reach-in), introduce a port on the owning side.
 
