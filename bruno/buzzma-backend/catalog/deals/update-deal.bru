@@ -1,0 +1,21 @@
+meta {
+  name: Update Deal
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/deals/{{dealId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "status": "paused"
+  }
+}

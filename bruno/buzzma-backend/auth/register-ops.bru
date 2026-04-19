@@ -1,0 +1,25 @@
+meta {
+  name: Register Ops User
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/auth/register-ops
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Ops User",
+    "mobile": "9876543211",
+    "password": "password123",
+    "role": "ops",
+    "code": "OPS_INVITE_CODE"
+  }
+}

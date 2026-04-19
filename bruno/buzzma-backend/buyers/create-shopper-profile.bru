@@ -1,0 +1,24 @@
+meta {
+  name: Create Shopper Profile
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/shopper-profiles
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "userId": "00000000-0000-0000-0000-000000000000",
+    "name": "Jane Shopper",
+    "mobile": "9876543210",
+    "email": "jane@example.com"
+  }
+}

@@ -1,0 +1,16 @@
+meta {
+  name: Ops - List Orders
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/ops/orders
+  body: none
+  auth: inherit
+}
+
+params:query {
+  limit: 50
+  offset: 0
+}

@@ -1,0 +1,21 @@
+meta {
+  name: Ops - Reject Mediator
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/ops/mediators/reject
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "id": "00000000-0000-0000-0000-000000000000"
+  }
+}

@@ -1,0 +1,23 @@
+meta {
+  name: Ops - Request Brand Connection
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/ops/connections/brand
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "brandCode": "BRAND001",
+    "agencyCode": "AGY001",
+    "agencyName": "Test Agency"
+  }
+}

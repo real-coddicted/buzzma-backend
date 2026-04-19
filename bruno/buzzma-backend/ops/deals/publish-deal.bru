@@ -1,0 +1,22 @@
+meta {
+  name: Ops - Publish Deal
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/ops/deals/publish
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "campaignId": "00000000-0000-0000-0000-000000000000",
+    "mediatorCode": "MED001"
+  }
+}

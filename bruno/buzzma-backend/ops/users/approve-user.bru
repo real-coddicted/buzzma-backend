@@ -1,0 +1,21 @@
+meta {
+  name: Ops - Approve User
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/ops/users/approve
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "id": "00000000-0000-0000-0000-000000000000"
+  }
+}

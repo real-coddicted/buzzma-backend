@@ -1,0 +1,11 @@
+meta {
+  name: Ops - Copy Campaign
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/ops/campaigns/{{campaignId}}/copy
+  body: none
+  auth: inherit
+}

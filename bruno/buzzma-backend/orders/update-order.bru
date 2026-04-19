@@ -1,0 +1,22 @@
+meta {
+  name: Update Order
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/orders/{{orderId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "workflowStatus": "claim_submitted",
+    "status": "active"
+  }
+}

@@ -1,0 +1,22 @@
+meta {
+  name: Ops - Verify Requirement
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/ops/orders/verify-requirement
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "orderId": "00000000-0000-0000-0000-000000000000",
+    "type": "rating"
+  }
+}

@@ -1,0 +1,16 @@
+meta {
+  name: List Mediator Profiles
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/mediator-profiles
+  body: none
+  auth: none
+}
+
+params:query {
+  limit: 50
+  offset: 0
+}

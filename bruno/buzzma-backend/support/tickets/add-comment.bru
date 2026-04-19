@@ -1,0 +1,23 @@
+meta {
+  name: Add Comment to Ticket
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/tickets/{{ticketId}}/comments
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "message": "We are looking into this issue and will update you shortly.",
+    "userName": "Support Agent",
+    "role": "ops"
+  }
+}

@@ -1,0 +1,22 @@
+meta {
+  name: Create Security Question
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/security-questions
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "question": "What was the name of your first pet?",
+    "isActive": true
+  }
+}

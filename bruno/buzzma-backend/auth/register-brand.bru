@@ -1,0 +1,24 @@
+meta {
+  name: Register Brand User
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/auth/register-brand
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Brand User",
+    "mobile": "9876543212",
+    "password": "password123",
+    "brandCode": "BRAND001"
+  }
+}

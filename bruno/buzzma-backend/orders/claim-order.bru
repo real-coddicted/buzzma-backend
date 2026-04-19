@@ -1,0 +1,23 @@
+meta {
+  name: Submit Order Claim
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/api/orders/claim
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "orderId": "00000000-0000-0000-0000-000000000000",
+    "screenshotOrder": "base64encodedimagestring",
+    "screenshotPayment": "base64encodedimagestring"
+  }
+}

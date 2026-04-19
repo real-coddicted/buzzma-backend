@@ -1,0 +1,22 @@
+meta {
+  name: Ops - Assign Campaign Slots
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/ops/campaigns/{{campaignId}}/slots
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "AGY001": 50,
+    "AGY002": 50
+  }
+}

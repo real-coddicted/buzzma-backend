@@ -1,0 +1,11 @@
+meta {
+  name: Ops - Delete Payout
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/api/ops/payouts/{{payoutId}}
+  body: none
+  auth: inherit
+}

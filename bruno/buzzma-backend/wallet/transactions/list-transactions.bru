@@ -1,0 +1,16 @@
+meta {
+  name: List Transactions
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/transactions
+  body: none
+  auth: none
+}
+
+params:query {
+  limit: 50
+  offset: 0
+}

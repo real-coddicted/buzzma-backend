@@ -1,0 +1,21 @@
+meta {
+  name: Ops - Verify Order Claim
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/ops/orders/verify-claim
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "orderId": "00000000-0000-0000-0000-000000000000"
+  }
+}

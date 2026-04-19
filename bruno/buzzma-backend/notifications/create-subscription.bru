@@ -1,0 +1,24 @@
+meta {
+  name: Create Push Subscription
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/push-subscriptions
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "userId": "00000000-0000-0000-0000-000000000000",
+    "deviceToken": "fcm-device-token-here",
+    "platform": "android",
+    "isActive": true
+  }
+}

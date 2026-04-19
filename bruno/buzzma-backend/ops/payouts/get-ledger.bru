@@ -1,0 +1,16 @@
+meta {
+  name: Ops - Get Ledger
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/ops/ledger
+  body: none
+  auth: inherit
+}
+
+params:query {
+  limit: 100
+  offset: 0
+}

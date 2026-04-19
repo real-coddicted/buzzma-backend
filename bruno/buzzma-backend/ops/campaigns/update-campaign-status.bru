@@ -1,0 +1,21 @@
+meta {
+  name: Ops - Update Campaign Status
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/ops/campaigns/{{campaignId}}/status
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "status": "active"
+  }
+}

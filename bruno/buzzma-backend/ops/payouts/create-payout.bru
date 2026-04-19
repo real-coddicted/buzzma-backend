@@ -1,0 +1,22 @@
+meta {
+  name: Ops - Create Payout
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/ops/payouts
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "mediatorUserId": "00000000-0000-0000-0000-000000000000",
+    "amountPaise": 50000
+  }
+}

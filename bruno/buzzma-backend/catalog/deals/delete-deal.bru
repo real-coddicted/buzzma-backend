@@ -1,0 +1,11 @@
+meta {
+  name: Delete Deal
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/deals/{{dealId}}
+  body: none
+  auth: none
+}

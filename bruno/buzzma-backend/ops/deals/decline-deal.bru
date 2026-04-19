@@ -1,0 +1,11 @@
+meta {
+  name: Ops - Decline Deal
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/ops/deals/{{dealId}}/decline
+  body: none
+  auth: inherit
+}

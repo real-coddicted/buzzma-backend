@@ -1,0 +1,21 @@
+meta {
+  name: Resolve Ticket
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/tickets/{{ticketId}}/resolve
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "note": "Issue resolved. Payout processed."
+  }
+}

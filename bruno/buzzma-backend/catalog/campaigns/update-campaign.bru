@@ -1,0 +1,23 @@
+meta {
+  name: Update Campaign
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/campaigns/{{campaignId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Updated Campaign Title",
+    "status": "paused",
+    "totalSlots": 50
+  }
+}

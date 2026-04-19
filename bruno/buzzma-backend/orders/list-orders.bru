@@ -1,0 +1,16 @@
+meta {
+  name: List Orders
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/orders
+  body: none
+  auth: none
+}
+
+params:query {
+  limit: 50
+  offset: 0
+}

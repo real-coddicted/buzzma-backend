@@ -1,0 +1,16 @@
+meta {
+  name: List Invites
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/invites
+  body: none
+  auth: none
+}
+
+params:query {
+  limit: 50
+  offset: 0
+}

@@ -1,9 +1,12 @@
 spring:
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/mobo}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/buzzma}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      data-source-properties:
+        stringtype: unspecified
   jpa:
     hibernate:
       ddl-auto: validate

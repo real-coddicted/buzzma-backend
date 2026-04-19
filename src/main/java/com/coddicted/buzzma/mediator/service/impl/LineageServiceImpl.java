@@ -1,10 +1,10 @@
 package com.coddicted.buzzma.mediator.service.impl;
 
-import com.coddicted.buzzma.shared.enums.AgencyStatus;
-import com.coddicted.buzzma.shared.enums.MediatorStatus;
 import com.coddicted.buzzma.agency.api.AgencyQueryPort;
 import com.coddicted.buzzma.mediator.persistence.MediatorProfilesRepository;
 import com.coddicted.buzzma.mediator.service.LineageService;
+import com.coddicted.buzzma.shared.enums.AgencyStatus;
+import com.coddicted.buzzma.shared.enums.MediatorStatus;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;

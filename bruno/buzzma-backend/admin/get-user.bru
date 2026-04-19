@@ -1,0 +1,11 @@
+meta {
+  name: Admin - Get User
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/admin/users/{{userId}}
+  body: none
+  auth: inherit
+}

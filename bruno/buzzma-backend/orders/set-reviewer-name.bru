@@ -1,0 +1,21 @@
+meta {
+  name: Set Reviewer Name
+  type: http
+  seq: 9
+}
+
+patch {
+  url: {{baseUrl}}/api/orders/{{orderId}}/reviewer-name
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "reviewerName": "John Reviewer"
+  }
+}

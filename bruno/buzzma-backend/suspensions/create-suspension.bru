@@ -1,0 +1,24 @@
+meta {
+  name: Create Suspension
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/suspensions
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "targetUserId": "00000000-0000-0000-0000-000000000000",
+    "reason": "Violation of terms",
+    "suspendedBy": "00000000-0000-0000-0000-000000000001",
+    "isActive": true
+  }
+}

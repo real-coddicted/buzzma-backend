@@ -1,0 +1,16 @@
+meta {
+  name: List System Configs
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/system-configs
+  body: none
+  auth: none
+}
+
+params:query {
+  limit: 50
+  offset: 0
+}

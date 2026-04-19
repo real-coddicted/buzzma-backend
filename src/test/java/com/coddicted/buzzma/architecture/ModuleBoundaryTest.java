@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 class ModuleBoundaryTest {
 
-  private static final String ROOT = "com.mobo";
+  private static final String ROOT = "com.coddicted.buzzma";
 
   private static final Set<String> MODULES =
       Set.of(
@@ -35,8 +35,9 @@ class ModuleBoundaryTest {
           "notifications",
           "shared");
 
-  /** Classes allowed to live directly at com.mobo root (outside any module). */
-  private static final Set<String> ROOT_WHITELIST = Set.of("com.mobo.JavaBackendApplication");
+  /** Classes allowed to live directly at com.coddicted.buzzma root (outside any module). */
+  private static final Set<String> ROOT_WHITELIST =
+      Set.of("com.coddicted.buzzma.JavaBackendApplication");
 
   /**
    * Fully-qualified classes allowed to import from other modules' internal (non-api, non-shared)
@@ -45,8 +46,8 @@ class ModuleBoundaryTest {
    */
   private static final Set<String> CROSS_MODULE_IMPORT_WHITELIST =
       Set.of(
-          "com.mobo.shared.security.SecurityConfig",
-          "com.mobo.mediator.security.UpstreamSuspensionFilter");
+          "com.coddicted.buzzma.shared.security.SecurityConfig",
+          "com.coddicted.buzzma.mediator.security.UpstreamSuspensionFilter");
 
   private static JavaClasses productionClasses;
 
@@ -63,10 +64,10 @@ class ModuleBoundaryTest {
   void everyClassResidesInOneOfTheTwelveModulesOrIsWhitelistedAtRoot() {
     classes()
         .that()
-        .resideInAPackage("com.mobo..")
+        .resideInAPackage("com.coddicted.buzzma..")
         .should(
             new com.tngtech.archunit.lang.ArchCondition<JavaClass>(
-                "reside in com.mobo.<module>.* where <module> is one of the 12 modules, or be whitelisted at com.mobo root") {
+                "reside in com.coddicted.buzzma.<module>.* where <module> is one of the 12 modules, or be whitelisted at com.coddicted.buzzma root") {
               @Override
               public void check(JavaClass item, com.tngtech.archunit.lang.ConditionEvents events) {
                 String fqn = item.getName();
@@ -77,7 +78,7 @@ class ModuleBoundaryTest {
                 if (!pkg.startsWith(ROOT + ".")) {
                   events.add(
                       com.tngtech.archunit.lang.SimpleConditionEvent.violated(
-                          item, fqn + " is not under com.mobo"));
+                          item, fqn + " is not under com.coddicted.buzzma"));
                   return;
                 }
                 String afterRoot = pkg.substring((ROOT + ".").length());
@@ -102,7 +103,7 @@ class ModuleBoundaryTest {
         .that()
         .areAnnotatedWith(Entity.class)
         .should()
-        .resideInAPackage("com.mobo..persistence..")
+        .resideInAPackage("com.coddicted.buzzma..persistence..")
         .check(productionClasses);
   }
 
@@ -112,9 +113,9 @@ class ModuleBoundaryTest {
         .that()
         .areAssignableTo(Repository.class)
         .and()
-        .resideInAPackage("com.mobo..")
+        .resideInAPackage("com.coddicted.buzzma..")
         .should()
-        .resideInAPackage("com.mobo..persistence..")
+        .resideInAPackage("com.coddicted.buzzma..persistence..")
         .check(productionClasses);
   }
 
@@ -124,7 +125,7 @@ class ModuleBoundaryTest {
         .that()
         .areAnnotatedWith(RestController.class)
         .should()
-        .resideInAPackage("com.mobo..web..")
+        .resideInAPackage("com.coddicted.buzzma..web..")
         .check(productionClasses);
   }
 
@@ -134,7 +135,7 @@ class ModuleBoundaryTest {
         .that()
         .areAnnotatedWith(Mapper.class)
         .should()
-        .resideInAPackage("com.mobo..mapper..")
+        .resideInAPackage("com.coddicted.buzzma..mapper..")
         .check(productionClasses);
   }
 
@@ -142,7 +143,7 @@ class ModuleBoundaryTest {
   void sharedModuleContainsNoEntitiesOrRepositories() {
     noClasses()
         .that()
-        .resideInAPackage("com.mobo.shared..")
+        .resideInAPackage("com.coddicted.buzzma.shared..")
         .should()
         .beAnnotatedWith(Entity.class)
         .orShould()
@@ -154,7 +155,7 @@ class ModuleBoundaryTest {
   void crossModuleImportsOnlyReachApiOrShared() {
     noClasses()
         .that()
-        .resideInAPackage("com.mobo..")
+        .resideInAPackage("com.coddicted.buzzma..")
         .and(
             new DescribedPredicate<JavaClass>("are not cross-module wiring whitelist") {
               @Override
@@ -164,7 +165,7 @@ class ModuleBoundaryTest {
             })
         .should(
             new com.tngtech.archunit.lang.ArchCondition<JavaClass>(
-                "only import from same module, com.mobo.<other>.api.*, or com.mobo.shared.*") {
+                "only import from same module, com.coddicted.buzzma.<other>.api.*, or com.coddicted.buzzma.shared.*") {
               @Override
               public void check(JavaClass item, com.tngtech.archunit.lang.ConditionEvents events) {
                 String ownModule = moduleOf(item);

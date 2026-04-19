@@ -1,0 +1,23 @@
+meta {
+  name: Ops - Request Missing Proof
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/ops/orders/request-missing-proof
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "orderId": "00000000-0000-0000-0000-000000000000",
+    "type": "review",
+    "note": "Please upload the product review screenshot."
+  }
+}

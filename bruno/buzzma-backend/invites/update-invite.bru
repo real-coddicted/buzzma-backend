@@ -1,0 +1,22 @@
+meta {
+  name: Update Invite
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/invites/{{inviteId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "status": "revoked",
+    "maxUses": 5
+  }
+}

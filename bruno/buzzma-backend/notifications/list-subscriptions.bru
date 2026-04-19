@@ -1,0 +1,16 @@
+meta {
+  name: List Push Subscriptions
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/push-subscriptions
+  body: none
+  auth: none
+}
+
+params:query {
+  limit: 50
+  offset: 0
+}

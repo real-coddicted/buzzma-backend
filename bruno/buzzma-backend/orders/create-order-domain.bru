@@ -1,0 +1,31 @@
+meta {
+  name: Create Order (Domain)
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/orders/create
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "userId": "00000000-0000-0000-0000-000000000000",
+    "brandUserId": "00000000-0000-0000-0000-000000000001",
+    "totalPaise": 5000,
+    "externalOrderId": "EXT-ORD-001",
+    "managerName": "Manager One",
+    "agencyName": "Agency One",
+    "buyerName": "Jane Doe",
+    "buyerMobile": "9876543210",
+    "brandName": "Acme Corp",
+    "settlementMode": "upi",
+    "returnWindowDays": 7
+  }
+}

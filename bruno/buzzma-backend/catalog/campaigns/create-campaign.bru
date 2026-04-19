@@ -1,0 +1,35 @@
+meta {
+  name: Create Campaign
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/campaigns
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Summer Sale Campaign",
+    "brandUserId": "00000000-0000-0000-0000-000000000000",
+    "brandName": "Acme Corp",
+    "platform": "amazon",
+    "image": "https://example.com/image.jpg",
+    "productUrl": "https://amazon.in/dp/EXAMPLE",
+    "originalPricePaise": 100000,
+    "pricePaise": 80000,
+    "payoutPaise": 5000,
+    "totalSlots": 100,
+    "dealType": "cashback",
+    "status": "active",
+    "returnWindowDays": 7,
+    "allowedAgencyCodes": [],
+    "openToAll": true
+  }
+}

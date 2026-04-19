@@ -1,0 +1,16 @@
+meta {
+  name: List Deals
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/deals
+  body: none
+  auth: none
+}
+
+params:query {
+  limit: 50
+  offset: 0
+}

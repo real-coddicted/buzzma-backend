@@ -1,0 +1,16 @@
+meta {
+  name: Brand - Get Orders
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/brand/orders
+  body: none
+  auth: inherit
+}
+
+params:query {
+  limit: 50
+  offset: 0
+}

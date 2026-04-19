@@ -1,0 +1,27 @@
+meta {
+  name: Create Invite
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/invites
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "code": "INVITE001",
+    "role": "mediator",
+    "label": "Mediator Invite",
+    "parentUserId": "00000000-0000-0000-0000-000000000000",
+    "parentCode": "MED001",
+    "status": "active",
+    "maxUses": 10
+  }
+}

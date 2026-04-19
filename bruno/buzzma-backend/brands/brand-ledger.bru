@@ -1,0 +1,16 @@
+meta {
+  name: Brand - Get Ledger
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/brand/ledger
+  body: none
+  auth: inherit
+}
+
+params:query {
+  limit: 50
+  offset: 0
+}

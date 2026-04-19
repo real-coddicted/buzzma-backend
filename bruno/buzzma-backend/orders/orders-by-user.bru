@@ -1,0 +1,16 @@
+meta {
+  name: Get Orders by User
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/orders/user/{{userId}}
+  body: none
+  auth: inherit
+}
+
+params:query {
+  limit: 50
+  offset: 0
+}

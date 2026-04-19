@@ -1,0 +1,25 @@
+meta {
+  name: Create Brand
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/brands
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Acme Corp",
+    "brandCode": "ACME001",
+    "ownerUserId": "00000000-0000-0000-0000-000000000000",
+    "connectedAgencyCodes": [],
+    "status": "active"
+  }
+}

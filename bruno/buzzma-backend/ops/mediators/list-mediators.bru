@@ -1,0 +1,16 @@
+meta {
+  name: Ops - List Mediators
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/ops/mediators
+  body: none
+  auth: inherit
+}
+
+params:query {
+  limit: 50
+  offset: 0
+}

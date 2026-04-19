@@ -1,0 +1,29 @@
+meta {
+  name: Create Ticket
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/tickets
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "userId": "00000000-0000-0000-0000-000000000000",
+    "userName": "Jane Doe",
+    "role": "mediator",
+    "orderId": "00000000-0000-0000-0000-000000000001",
+    "issueType": "payment_issue",
+    "description": "I have not received my payout for order EXT-ORD-001.",
+    "status": "open",
+    "targetRole": "ops",
+    "priority": "medium"
+  }
+}

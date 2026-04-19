@@ -1,0 +1,25 @@
+meta {
+  name: Create Ticket Comment
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/ticket-comments
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "ticketId": "00000000-0000-0000-0000-000000000000",
+    "userId": "00000000-0000-0000-0000-000000000001",
+    "userName": "Support Agent",
+    "role": "ops",
+    "message": "We are investigating this issue."
+  }
+}

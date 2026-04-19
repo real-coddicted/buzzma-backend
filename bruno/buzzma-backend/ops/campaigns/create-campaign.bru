@@ -1,0 +1,32 @@
+meta {
+  name: Ops - Create Campaign
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/ops/campaigns
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "brandUserId": "00000000-0000-0000-0000-000000000000",
+    "title": "Summer Sale Campaign",
+    "platform": "amazon",
+    "image": "https://example.com/image.jpg",
+    "productUrl": "https://amazon.in/dp/EXAMPLE",
+    "originalPricePaise": 100000,
+    "pricePaise": 80000,
+    "payoutPaise": 5000,
+    "totalSlots": 100,
+    "dealType": "cashback",
+    "returnWindowDays": 7,
+    "allowedAgencyCodes": []
+  }
+}

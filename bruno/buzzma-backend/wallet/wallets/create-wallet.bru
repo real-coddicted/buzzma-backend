@@ -1,0 +1,26 @@
+meta {
+  name: Create Wallet
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/wallets
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "ownerUserId": "00000000-0000-0000-0000-000000000000",
+    "currency": "INR",
+    "availablePaise": 0,
+    "pendingPaise": 0,
+    "lockedPaise": 0,
+    "version": 0
+  }
+}

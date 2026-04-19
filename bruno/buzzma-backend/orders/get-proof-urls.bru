@@ -1,0 +1,11 @@
+meta {
+  name: Get Proof URLs
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/api/orders/{{orderId}}/proof-urls
+  body: none
+  auth: inherit
+}

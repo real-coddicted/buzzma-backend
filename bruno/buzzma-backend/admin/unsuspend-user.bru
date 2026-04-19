@@ -1,0 +1,15 @@
+meta {
+  name: Unsuspend User
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/admin/unsuspend/{{targetUserId}}
+  body: none
+  auth: inherit
+}
+
+params:query {
+  reason: Issue resolved
+}

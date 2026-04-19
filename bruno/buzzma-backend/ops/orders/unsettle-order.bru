@@ -1,0 +1,21 @@
+meta {
+  name: Ops - Unsettle Order
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/ops/orders/unsettle
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "orderId": "00000000-0000-0000-0000-000000000000"
+  }
+}

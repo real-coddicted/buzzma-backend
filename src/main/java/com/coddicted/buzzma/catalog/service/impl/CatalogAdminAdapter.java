@@ -1,7 +1,5 @@
 package com.coddicted.buzzma.catalog.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.coddicted.buzzma.catalog.api.CampaignsResponseDto;
 import com.coddicted.buzzma.catalog.api.CatalogAdminPort;
 import com.coddicted.buzzma.catalog.api.DealsResponseDto;
@@ -16,6 +14,8 @@ import com.coddicted.buzzma.identity.api.UsersResponseDto;
 import com.coddicted.buzzma.shared.enums.CampaignStatus;
 import com.coddicted.buzzma.shared.enums.DealType;
 import com.coddicted.buzzma.shared.exception.ApiException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;

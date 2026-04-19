@@ -1,0 +1,17 @@
+meta {
+  name: Ops - List Verified Users
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/ops/users/verified
+  body: none
+  auth: inherit
+}
+
+params:query {
+  parentCode: MED001
+  limit: 50
+  offset: 0
+}

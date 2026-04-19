@@ -1,0 +1,27 @@
+meta {
+  name: Create User
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/users
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Test User",
+    "mobile": "9876543210",
+    "passwordHash": "$2a$10$examplehashedpassword",
+    "role": "mediator",
+    "roles": ["mediator"],
+    "status": "active",
+    "kycStatus": "pending"
+  }
+}

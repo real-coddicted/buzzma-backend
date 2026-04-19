@@ -1,0 +1,23 @@
+meta {
+  name: Create Deal
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/deals
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "campaignId": "00000000-0000-0000-0000-000000000000",
+    "mediatorCode": "MED001",
+    "status": "active"
+  }
+}
