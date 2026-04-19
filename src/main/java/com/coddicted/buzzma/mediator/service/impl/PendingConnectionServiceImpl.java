@@ -32,7 +32,7 @@ public class PendingConnectionServiceImpl extends BaseCrudService
   @Transactional(readOnly = true)
   public List<PendingConnectionsResponseDto> list(int limit, int offset) {
     var pageable =
-        new OffsetBasedPageRequest(limit, offset, Sort.by(Sort.Direction.DESC, "createdAt"));
+        new OffsetBasedPageRequest(limit, offset, Sort.by(Sort.Direction.DESC, "timestamp"));
     return repository.findAllByIsDeletedFalse(pageable).stream()
         .map(mapper::toResponse)
         .collect(Collectors.toList());
