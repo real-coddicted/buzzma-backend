@@ -37,7 +37,7 @@ class ModuleBoundaryTest {
 
   /** Classes allowed to live directly at com.coddicted.buzzma root (outside any module). */
   private static final Set<String> ROOT_WHITELIST =
-      Set.of("com.coddicted.buzzma.JavaBackendApplication");
+      Set.of("com.coddicted.buzzma.BuzzmaBackendApplication");
 
   /**
    * Fully-qualified classes allowed to import from other modules' internal (non-api, non-shared)
