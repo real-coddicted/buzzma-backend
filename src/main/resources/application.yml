@@ -1,8 +1,11 @@
 spring:
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/buzzma}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
+    #url: ${DB_URL:jdbc:postgresql://localhost:5432/buzzma}
+    #username: ${DB_USERNAME:postgres}
+    #password: ${DB_PASSWORD:postgres}
+    url: jdbc:postgresql://159.195.35.137:5443/buzzma?currentSchema=buzzma_rewrite_test&sslmode=require&channel_binding=require
+    username: buzzma_app_test_user
+    password: npg_xY0nlgoHcCf2
     driver-class-name: org.postgresql.Driver
     hikari:
       data-source-properties:
@@ -18,7 +21,8 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
-    baseline-on-migrate: false
+    baseline-on-migrate: true
+    baseline-version: 14
 
 server:
   port: ${PORT:8080}

@@ -34,6 +34,7 @@ class ApplicationSmokeTest {
           .withUsername("mobo")
           .withPassword("mobo");
 
+  // Docker should be up and running
   static {
     POSTGRES.start();
   }
