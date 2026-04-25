@@ -4,6 +4,7 @@ import com.coddicted.buzzma.identity.api.auth.ForgotPasswordLookupRequest;
 import com.coddicted.buzzma.identity.api.auth.ForgotPasswordResetRequest;
 import com.coddicted.buzzma.identity.api.auth.LoginRequest;
 import com.coddicted.buzzma.identity.api.auth.LoginResponse;
+import com.coddicted.buzzma.identity.api.auth.RefreshRequest;
 import com.coddicted.buzzma.identity.api.auth.RegisterBrandRequest;
 import com.coddicted.buzzma.identity.api.auth.RegisterOpsRequest;
 import com.coddicted.buzzma.identity.api.auth.RegisterRequest;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,8 +48,8 @@ public class AuthController {
   }
 
   @PostMapping("/refresh")
-  public LoginResponse refresh(@RequestHeader("X-Refresh-Token") String refreshToken) {
-    return authService.refresh(refreshToken);
+  public LoginResponse refresh(@Valid @RequestBody RefreshRequest request) {
+    return authService.refresh(request.getRefreshToken());
   }
 
   @GetMapping("/me")

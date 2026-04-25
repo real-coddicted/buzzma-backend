@@ -73,4 +73,43 @@ public interface OrdersRepository extends JpaRepository<OrdersEntity, UUID> {
       @Param("now") Instant now,
       @Param("actorUserId") UUID actorUserId,
       @Param("events") String events);
+
+  @Query(
+      value =
+          "SELECT COALESCE(SUM(total_paise), 0) FROM orders"
+              + " WHERE manager_name = ANY(:managerNames) AND is_deleted = false",
+      nativeQuery = true)
+  long sumTotalPaiseByManagerNames(@Param("managerNames") String[] managerNames);
+
+  @Query(
+      value =
+          "SELECT COUNT(*) FROM orders"
+              + " WHERE manager_name = ANY(:managerNames) AND is_deleted = false"
+              + " AND created_at >= :since",
+      nativeQuery = true)
+  long countByManagerNamesAndCreatedAtAfter(
+      @Param("managerNames") String[] managerNames, @Param("since") Instant since);
+
+  @Query(
+      value =
+          "SELECT TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD') AS day,"
+              + " COALESCE(SUM(total_paise), 0)::bigint AS total"
+              + " FROM orders"
+              + " WHERE manager_name = ANY(:managerNames) AND is_deleted = false"
+              + " AND created_at BETWEEN :start AND :end"
+              + " GROUP BY day ORDER BY day",
+      nativeQuery = true)
+  List<Object[]> findDailyRevenue(
+      @Param("managerNames") String[] managerNames,
+      @Param("start") Instant start,
+      @Param("end") Instant end);
+
+  @Query(
+      value =
+          "SELECT COALESCE(brand_name, 'Unknown') AS name, COUNT(*) AS count"
+              + " FROM orders"
+              + " WHERE manager_name = ANY(:managerNames) AND is_deleted = false"
+              + " GROUP BY name ORDER BY count DESC LIMIT 5",
+      nativeQuery = true)
+  List<Object[]> findTopBrandsByOrderCount(@Param("managerNames") String[] managerNames);
 }

@@ -68,7 +68,7 @@ public class CatalogAdminAdapter implements CatalogAdminPort {
       UUID actorUserId) {
 
     CampaignsEntity campaign = new CampaignsEntity();
-    campaign.setBrandUserId(brandUserId);
+    campaign.setBrandUserId(brandUserId != null ? brandUserId : actorUserId);
     campaign.setTitle(title);
     campaign.setPlatform(platform);
     campaign.setImage(image);
@@ -91,10 +91,13 @@ public class CatalogAdminAdapter implements CatalogAdminPort {
     campaign.setCreatedBy(actorUserId);
     campaign.setUpdatedBy(actorUserId);
 
-    Optional<UsersResponseDto> brand = userQueryPort.findById(brandUserId);
-    brand.ifPresent(u -> campaign.setBrandName(u.getName() != null ? u.getName() : "Brand"));
-    if (brand.isEmpty() && brandNameFallback != null) {
-      campaign.setBrandName(brandNameFallback);
+    UUID resolvedBrandId = brandUserId != null ? brandUserId : actorUserId;
+    Optional<UsersResponseDto> brand = userQueryPort.findById(resolvedBrandId);
+    if (brand.isPresent()) {
+      String name = brand.get().getName();
+      campaign.setBrandName(name != null && !name.isBlank() ? name : (brandNameFallback != null ? brandNameFallback : "Brand"));
+    } else {
+      campaign.setBrandName(brandNameFallback != null ? brandNameFallback : "Brand");
     }
 
     CampaignsEntity saved = campaignsRepository.save(campaign);

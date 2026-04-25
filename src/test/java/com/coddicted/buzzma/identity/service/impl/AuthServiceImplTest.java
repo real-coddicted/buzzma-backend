@@ -124,8 +124,8 @@ class AuthServiceImplTest {
 
     LoginResponse response = service.register(req);
 
-    assertThat(response.getAccessToken()).isEqualTo("access-token");
-    assertThat(response.getRefreshToken()).isEqualTo("refresh-token");
+    assertThat(response.getTokens().getAccessToken()).isEqualTo("access-token");
+    assertThat(response.getTokens().getRefreshToken()).isEqualTo("refresh-token");
     assertThat(response.getUser()).isNotNull();
   }
 
@@ -208,8 +208,8 @@ class AuthServiceImplTest {
 
     LoginResponse response = service.login(req);
 
-    assertThat(response.getAccessToken()).isEqualTo("at");
-    assertThat(response.getRefreshToken()).isEqualTo("rt");
+    assertThat(response.getTokens().getAccessToken()).isEqualTo("at");
+    assertThat(response.getTokens().getRefreshToken()).isEqualTo("rt");
   }
 
   // ── refresh ─────────────────────────────────────────────────────────────
@@ -230,7 +230,7 @@ class AuthServiceImplTest {
 
     LoginResponse response = service.refresh("rt-valid");
 
-    assertThat(response.getAccessToken()).isEqualTo("new-at");
+    assertThat(response.getTokens().getAccessToken()).isEqualTo("new-at");
   }
 
   @Test

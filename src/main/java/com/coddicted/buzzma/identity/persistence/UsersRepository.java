@@ -21,6 +21,8 @@ public interface UsersRepository extends JpaRepository<UsersEntity, UUID> {
 
   List<UsersEntity> findAllByParentCodeAndIsDeletedFalse(String parentCode);
 
+  long countByParentCodeAndIsDeletedFalse(String parentCode);
+
   Page<UsersEntity> findAllByParentCodeAndIsVerifiedByMediatorAndIsDeletedFalse(
       String parentCode, Boolean isVerifiedByMediator, Pageable pageable);
 }

@@ -15,6 +15,7 @@ public interface OpsService {
 
   CampaignsResponseDto createCampaign(
       UUID brandUserId,
+      String brandName,
       String title,
       String platform,
       String image,
@@ -82,6 +83,12 @@ public interface OpsService {
   // ── Dashboard / listing ──────────────────────────────────────────────────────
 
   Map<String, Object> getDashboardStats();
+
+  Map<String, Object> getAgencyDashboardStats(String agencyCode);
+
+  List<Map<String, Object>> getRevenueTrend(String agencyCode, String range);
+
+  List<Map<String, Object>> getBrandPerformance(String agencyCode);
 
   List<UsersResponseDto> getMediators(String agencyCode, int limit, int offset);
 

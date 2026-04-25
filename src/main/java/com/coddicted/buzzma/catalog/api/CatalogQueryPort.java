@@ -14,4 +14,6 @@ public interface CatalogQueryPort {
   List<CampaignsResponseDto> listCampaigns(int limit, int offset);
 
   long countActiveCampaigns();
+
+  long countActiveCampaignsForAgency(String agencyCode, List<String> managerCodes);
 }

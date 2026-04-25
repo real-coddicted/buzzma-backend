@@ -25,4 +25,8 @@ public interface UserQueryPort {
       String parentCode, boolean verified, int limit, int offset);
 
   long count();
+
+  long countByParentCode(String parentCode);
+
+  List<String> listMediatorCodesByParentCode(String parentCode);
 }

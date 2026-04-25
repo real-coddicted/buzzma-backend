@@ -19,7 +19,13 @@ import com.coddicted.buzzma.shared.exception.ApiException;
 import com.coddicted.buzzma.wallet.api.PayoutsResponseDto;
 import com.coddicted.buzzma.wallet.api.WalletAdminPort;
 import com.coddicted.buzzma.wallet.api.WalletQueryPort;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -71,6 +77,7 @@ public class OpsServiceImpl implements OpsService {
   @Transactional
   public CampaignsResponseDto createCampaign(
       UUID brandUserId,
+      String brandName,
       String title,
       String platform,
       String image,
@@ -86,7 +93,7 @@ public class OpsServiceImpl implements OpsService {
     CampaignsResponseDto saved =
         catalogAdminPort.createCampaign(
             brandUserId,
-            null,
+            brandName,
             title,
             platform,
             image,
@@ -486,6 +493,96 @@ public class OpsServiceImpl implements OpsService {
         "User",
         brand.getId().toString(),
         "{\"agencyCode\":\"" + agencyCode + "\",\"brandCode\":\"" + brandCode + "\"}");
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Map<String, Object> getAgencyDashboardStats(String agencyCode) {
+    List<String> mediatorCodes = userQueryPort.listMediatorCodesByParentCode(agencyCode);
+    List<String> allCodes = new ArrayList<>(mediatorCodes);
+    allCodes.add(agencyCode);
+
+    long totalMediators = userQueryPort.countByParentCode(agencyCode);
+    long totalPaise = orderQueryPort.sumTotalPaiseByManagerNames(allCodes);
+    double revenue = totalPaise / 100.0;
+
+    Instant todayStart = LocalDate.now(ZoneOffset.UTC).atStartOfDay(ZoneOffset.UTC).toInstant();
+    long ordersToday = orderQueryPort.countByManagerNamesAndCreatedAtAfter(allCodes, todayStart);
+
+    long activeCampaigns = catalogQueryPort.countActiveCampaignsForAgency(agencyCode, allCodes);
+
+    Map<String, Object> stats = new HashMap<>();
+    stats.put("revenue", revenue);
+    stats.put("totalMediators", totalMediators);
+    stats.put("activeCampaigns", activeCampaigns);
+    stats.put("ordersToday", ordersToday);
+    return stats;
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<Map<String, Object>> getRevenueTrend(String agencyCode, String range) {
+    List<String> mediatorCodes = userQueryPort.listMediatorCodesByParentCode(agencyCode);
+    List<String> allCodes = new ArrayList<>(mediatorCodes);
+    allCodes.add(agencyCode);
+
+    LocalDate today = LocalDate.now(ZoneOffset.UTC);
+    LocalDate startDate;
+    LocalDate endDate = today;
+
+    switch (range == null ? "last7" : range) {
+      case "yesterday":
+        startDate = today.minusDays(1);
+        endDate = today.minusDays(1);
+        break;
+      case "thisMonth":
+        startDate = today.withDayOfMonth(1);
+        break;
+      case "last30":
+        startDate = today.minusDays(29);
+        break;
+      default:
+        startDate = today.minusDays(6);
+    }
+
+    Instant start = startDate.atStartOfDay(ZoneOffset.UTC).toInstant();
+    Instant end = endDate.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+
+    List<Map<String, Object>> rows = orderQueryPort.findDailyRevenue(allCodes, start, end);
+    Map<String, Long> byDay = new LinkedHashMap<>();
+    for (Map<String, Object> row : rows) {
+      byDay.put((String) row.get("day"), ((Number) row.get("total")).longValue());
+    }
+
+    DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM");
+    List<Map<String, Object>> result = new ArrayList<>();
+    for (LocalDate d = startDate; !d.isAfter(endDate); d = d.plusDays(1)) {
+      String key = d.format(DateTimeFormatter.ISO_LOCAL_DATE);
+      long paise = byDay.getOrDefault(key, 0L);
+      Map<String, Object> point = new LinkedHashMap<>();
+      point.put("name", d.format(fmt));
+      point.put("val", paise / 100.0);
+      result.add(point);
+    }
+    return result;
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<Map<String, Object>> getBrandPerformance(String agencyCode) {
+    List<String> mediatorCodes = userQueryPort.listMediatorCodesByParentCode(agencyCode);
+    List<String> allCodes = new ArrayList<>(mediatorCodes);
+    allCodes.add(agencyCode);
+
+    return orderQueryPort.findTopBrandsByOrderCount(allCodes).stream()
+        .map(
+            row -> {
+              Map<String, Object> m = new LinkedHashMap<>();
+              m.put("name", row.get("name"));
+              m.put("count", ((Number) row.get("count")).longValue());
+              return m;
+            })
+        .collect(java.util.stream.Collectors.toList());
   }
 
   // ── Private helpers ───────────────────────────────────────────────────────────

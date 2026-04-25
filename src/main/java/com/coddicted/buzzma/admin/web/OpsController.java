@@ -41,22 +41,23 @@ public class OpsController {
 
   @PostMapping("/campaigns")
   @ResponseStatus(HttpStatus.CREATED)
-  @PreAuthorize("hasAnyRole('ops','admin')")
+  @PreAuthorize("hasAnyRole('ops','admin','agency')")
   public CampaignsResponseDto createCampaign(
       @Valid @RequestBody CreateCampaignRequest req, @CurrentUserId UUID actorUserId) {
     return opsService.createCampaign(
         req.brandUserId(),
+        req.brandName(),
         req.title(),
         req.platform(),
         req.image(),
         req.productUrl(),
-        req.originalPricePaise(),
-        req.pricePaise(),
-        req.payoutPaise(),
+        req.resolvedOriginalPricePaise(),
+        req.resolvedPricePaise(),
+        req.resolvedPayoutPaise(),
         req.totalSlots(),
         req.dealType(),
         req.returnWindowDays() != null ? req.returnWindowDays() : 14,
-        req.allowedAgencyCodes(),
+        req.resolvedAllowedAgencyCodes(),
         actorUserId);
   }
 
@@ -308,6 +309,25 @@ public class OpsController {
     return opsService.getDashboardStats();
   }
 
+  @GetMapping("/dashboard-stats")
+  @PreAuthorize("hasAnyRole('ops','admin','agency')")
+  public Map<String, Object> getAgencyDashboardStats(@RequestParam String agencyCode) {
+    return opsService.getAgencyDashboardStats(agencyCode);
+  }
+
+  @GetMapping("/revenue-trend")
+  @PreAuthorize("hasAnyRole('ops','admin','agency')")
+  public List<Map<String, Object>> getRevenueTrend(
+      @RequestParam String agencyCode, @RequestParam(defaultValue = "last7") String range) {
+    return opsService.getRevenueTrend(agencyCode, range);
+  }
+
+  @GetMapping("/brand-performance")
+  @PreAuthorize("hasAnyRole('ops','admin','agency')")
+  public List<Map<String, Object>> getBrandPerformance(@RequestParam String agencyCode) {
+    return opsService.getBrandPerformance(agencyCode);
+  }
+
   // ── Connections ───────────────────────────────────────────────────────────────
 
   @PostMapping("/connections/brand")
@@ -322,18 +342,44 @@ public class OpsController {
   // ── Inner request records ─────────────────────────────────────────────────────
 
   public record CreateCampaignRequest(
-      @NotNull UUID brandUserId,
+      UUID brandUserId,
       @NotBlank String title,
       @NotBlank String platform,
       @NotBlank String image,
       @NotBlank String productUrl,
-      @NotNull Integer originalPricePaise,
-      @NotNull Integer pricePaise,
-      @NotNull Integer payoutPaise,
+      Double originalPrice,
+      Integer originalPricePaise,
+      Double price,
+      Integer pricePaise,
+      Double payout,
+      Integer payoutPaise,
       @NotNull Integer totalSlots,
       String dealType,
       Integer returnWindowDays,
-      String[] allowedAgencyCodes) {}
+      String[] allowedAgencyCodes,
+      String[] allowedAgencies,
+      String brandName) {
+
+    int resolvedOriginalPricePaise() {
+      if (originalPricePaise != null) return originalPricePaise;
+      return originalPrice != null ? (int) Math.round(originalPrice * 100) : 0;
+    }
+
+    int resolvedPricePaise() {
+      if (pricePaise != null) return pricePaise;
+      return price != null ? (int) Math.round(price * 100) : 0;
+    }
+
+    int resolvedPayoutPaise() {
+      if (payoutPaise != null) return payoutPaise;
+      return payout != null ? (int) Math.round(payout * 100) : 0;
+    }
+
+    String[] resolvedAllowedAgencyCodes() {
+      if (allowedAgencyCodes != null) return allowedAgencyCodes;
+      return allowedAgencies != null ? allowedAgencies : new String[0];
+    }
+  }
 
   public record PublishDealRequest(@NotNull UUID campaignId, @NotBlank String mediatorCode) {}
 

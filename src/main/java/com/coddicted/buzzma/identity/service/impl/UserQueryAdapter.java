@@ -107,4 +107,19 @@ public class UserQueryAdapter implements UserQueryPort {
   public long count() {
     return usersRepository.count();
   }
+
+  @Override
+  @Transactional(readOnly = true)
+  public long countByParentCode(String parentCode) {
+    return usersRepository.countByParentCodeAndIsDeletedFalse(parentCode);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<String> listMediatorCodesByParentCode(String parentCode) {
+    return usersRepository.findAllByParentCodeAndIsDeletedFalse(parentCode).stream()
+        .map(UsersEntity::getMediatorCode)
+        .filter(code -> code != null && !code.isBlank())
+        .collect(Collectors.toList());
+  }
 }

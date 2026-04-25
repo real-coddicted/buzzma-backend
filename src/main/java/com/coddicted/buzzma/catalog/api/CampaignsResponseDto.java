@@ -42,7 +42,7 @@ public class CampaignsResponseDto {
 
   String status;
 
-  @Nullable String[] allowedAgencyCodes;
+  @Nullable String[] allowedAgencies;
 
   @Nullable String assignments;
 

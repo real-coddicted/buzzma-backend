@@ -5,6 +5,7 @@ import com.coddicted.buzzma.catalog.api.CampaignsResponseDto;
 import com.coddicted.buzzma.catalog.persistence.CampaignsEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
@@ -15,6 +16,7 @@ public interface CampaignsMapper {
 
   CampaignsEntity toEntity(CampaignsRequestDto request);
 
+  @Mapping(source = "allowedAgencyCodes", target = "allowedAgencies")
   CampaignsResponseDto toResponse(CampaignsEntity entity);
 
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

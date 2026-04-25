@@ -7,9 +7,14 @@ import lombok.Value;
 @Builder
 public class LoginResponse {
 
-  String accessToken;
-
-  String refreshToken;
+  Tokens tokens;
 
   UserSummary user;
+
+  @Value
+  @Builder
+  public static class Tokens {
+    String accessToken;
+    String refreshToken;
+  }
 }
