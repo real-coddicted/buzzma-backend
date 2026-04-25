@@ -180,8 +180,8 @@ public class OpsServiceImpl implements OpsService {
 
   @Override
   @Transactional
-  public DealsResponseDto publishDeal(UUID campaignId, String mediatorCode, UUID actorUserId) {
-    DealsResponseDto saved = catalogAdminPort.publishDeal(campaignId, mediatorCode, actorUserId);
+  public DealsResponseDto publishDeal(UUID campaignId, String mediatorCode, int commissionPaise, UUID actorUserId) {
+    DealsResponseDto saved = catalogAdminPort.publishDeal(campaignId, mediatorCode, commissionPaise, actorUserId);
     auditLogWriter.write(
         actorUserId,
         new String[] {"ops"},

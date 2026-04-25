@@ -250,7 +250,7 @@ public class CatalogAdminAdapter implements CatalogAdminPort {
 
   @Override
   @Transactional
-  public DealsResponseDto publishDeal(UUID campaignId, String mediatorCode, UUID actorUserId) {
+  public DealsResponseDto publishDeal(UUID campaignId, String mediatorCode, int commissionPaise, UUID actorUserId) {
     CampaignsEntity campaign =
         campaignsRepository
             .findById(campaignId)
@@ -264,8 +264,17 @@ public class CatalogAdminAdapter implements CatalogAdminPort {
     Optional<DealsEntity> existing =
         dealsRepository.findByCampaignIdAndMediatorCode(campaignId, mediatorCode);
     if (existing.isPresent() && !Boolean.TRUE.equals(existing.get().getIsDeleted())) {
-      return dealsMapper.toResponse(existing.get());
+      // Update commission on re-publish
+      DealsEntity existingDeal = existing.get();
+      existingDeal.setCommissionPaise(commissionPaise);
+      existingDeal.setPricePaise(
+          (campaign.getPricePaise() != null ? campaign.getPricePaise() : 0) + commissionPaise);
+      existingDeal.setUpdatedBy(actorUserId);
+      return dealsMapper.toResponse(dealsRepository.save(existingDeal));
     }
+
+    int effectivePricePaise =
+        (campaign.getPricePaise() != null ? campaign.getPricePaise() : 0) + commissionPaise;
 
     DealsEntity deal = new DealsEntity();
     deal.setCampaignId(campaignId);
@@ -277,9 +286,9 @@ public class CatalogAdminAdapter implements CatalogAdminPort {
     deal.setBrandName(campaign.getBrandName());
     deal.setDealType(campaign.getDealType());
     deal.setOriginalPricePaise(campaign.getOriginalPricePaise());
-    deal.setPricePaise(campaign.getPricePaise());
+    deal.setPricePaise(effectivePricePaise);
     deal.setPayoutPaise(campaign.getPayoutPaise());
-    deal.setCommissionPaise(campaign.getPayoutPaise());
+    deal.setCommissionPaise(commissionPaise);
     deal.setActive(true);
     deal.setCreatedBy(actorUserId);
     deal.setUpdatedBy(actorUserId);
