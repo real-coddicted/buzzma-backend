@@ -1,6 +1,6 @@
-package com.coddicted.buzzma.admin.service.impl;
+package com.coddicted.buzzma.ops.service.impl;
 
-import com.coddicted.buzzma.admin.service.OpsService;
+import com.coddicted.buzzma.ops.service.OpsService;
 import com.coddicted.buzzma.catalog.api.CampaignsResponseDto;
 import com.coddicted.buzzma.catalog.api.CatalogAdminPort;
 import com.coddicted.buzzma.catalog.api.CatalogQueryPort;

@@ -1,4 +1,4 @@
-package com.coddicted.buzzma.admin.service;
+package com.coddicted.buzzma.ops.service;
 
 import com.coddicted.buzzma.catalog.api.CampaignsResponseDto;
 import com.coddicted.buzzma.catalog.api.DealsResponseDto;

@@ -1,6 +1,6 @@
-package com.coddicted.buzzma.admin.web;
+package com.coddicted.buzzma.ops.web;
 
-import com.coddicted.buzzma.admin.service.OpsService;
+import com.coddicted.buzzma.ops.service.OpsService;
 import com.coddicted.buzzma.catalog.api.CampaignsResponseDto;
 import com.coddicted.buzzma.catalog.api.DealsResponseDto;
 import com.coddicted.buzzma.identity.api.UsersResponseDto;
