@@ -58,7 +58,7 @@ public class TicketsEntity implements Auditable {
   private String targetRole;
 
   @Column(name = "priority")
-  private String priority;
+  private String priority = "medium";
 
   @Column(name = "resolved_by")
   private UUID resolvedBy;

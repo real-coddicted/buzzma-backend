@@ -18,6 +18,12 @@ public interface OrdersRepository extends JpaRepository<OrdersEntity, UUID> {
 
   Page<OrdersEntity> findAllByIsDeletedFalse(Pageable pageable);
 
+  long countByManagerNameAndWorkflowStatusAndIsDeletedFalse(
+      String managerName, OrderWorkflowStatus workflowStatus);
+
+  List<OrdersEntity> findAllByUserIdAndIsDeletedFalseAndUpdatedAtAfter(
+      UUID userId, Instant updatedAt);
+
   Optional<OrdersEntity> findByExternalOrderIdAndIsDeletedFalse(String externalOrderId);
 
   Page<OrdersEntity> findAllByUserIdAndIsDeletedFalse(UUID userId, Pageable pageable);
