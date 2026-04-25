@@ -1,7 +1,6 @@
 package com.coddicted.buzzma.support.api;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotBlank;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Value;
@@ -14,15 +13,15 @@ public class TicketsRequestDto {
 
   UUID userId;
 
-  @NotBlank String userName;
+  @Nullable String userName;
 
-  @NotBlank String role;
+  @Nullable String role;
 
   @Nullable String orderId;
 
-  @NotBlank String issueType;
+  @Nullable String issueType;
 
-  @NotBlank String description;
+  @Nullable String description;
 
   @Nullable String status;
 

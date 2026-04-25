@@ -1,9 +1,14 @@
 package com.coddicted.buzzma.support.web;
 
+import com.coddicted.buzzma.identity.persistence.UsersEntity;
+import com.coddicted.buzzma.identity.persistence.UsersRepository;
+import com.coddicted.buzzma.shared.enums.TicketStatus;
+import com.coddicted.buzzma.shared.exception.ApiException;
 import com.coddicted.buzzma.shared.security.CurrentUserId;
 import com.coddicted.buzzma.support.api.TicketCommentsResponseDto;
 import com.coddicted.buzzma.support.api.TicketsRequestDto;
 import com.coddicted.buzzma.support.api.TicketsResponseDto;
+import com.coddicted.buzzma.support.persistence.TicketCommentsRepository;
 import com.coddicted.buzzma.support.service.TicketDomainService;
 import com.coddicted.buzzma.support.service.TicketService;
 import jakarta.validation.Valid;
@@ -14,6 +19,8 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -35,10 +42,18 @@ public class TicketsController {
 
   private final TicketService service;
   private final TicketDomainService ticketDomainService;
+  private final UsersRepository usersRepository;
+  private final TicketCommentsRepository ticketCommentsRepository;
 
-  public TicketsController(TicketService service, TicketDomainService ticketDomainService) {
+  public TicketsController(
+      TicketService service,
+      TicketDomainService ticketDomainService,
+      UsersRepository usersRepository,
+      TicketCommentsRepository ticketCommentsRepository) {
     this.service = service;
     this.ticketDomainService = ticketDomainService;
+    this.usersRepository = usersRepository;
+    this.ticketCommentsRepository = ticketCommentsRepository;
   }
 
   @GetMapping
@@ -60,9 +75,39 @@ public class TicketsController {
   }
 
   @PatchMapping("/{id}")
+  @PreAuthorize("isAuthenticated()")
   public TicketsResponseDto update(
-      @PathVariable UUID id, @Valid @RequestBody TicketsRequestDto request) {
-    return service.update(id, request);
+      @PathVariable UUID id,
+      @RequestBody UpdateTicketRequest request,
+      @CurrentUserId UUID actorId) {
+    String status = request.status();
+    Boolean escalate = request.escalate();
+
+    if (Boolean.TRUE.equals(escalate)) {
+      return ticketDomainService.resolveTicket(id, null, actorId);
+    }
+
+    if (status == null) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, "STATUS_REQUIRED");
+    }
+
+    try {
+      TicketStatus ts = TicketStatus.valueOf(status);
+      if (ts == TicketStatus.Resolved) {
+        return ticketDomainService.resolveTicket(id, request.resolutionNote(), actorId);
+      } else if (ts == TicketStatus.Rejected) {
+        return ticketDomainService.rejectTicket(id, request.resolutionNote(), actorId);
+      }
+    } catch (IllegalArgumentException ignored) {
+      // fall through to generic update
+    }
+
+    TicketsRequestDto dto =
+        TicketsRequestDto.builder()
+            .status(status)
+            .resolutionNote(request.resolutionNote())
+            .build();
+    return service.update(id, dto);
   }
 
   @DeleteMapping("/{id}")
@@ -85,6 +130,27 @@ public class TicketsController {
     return ticketDomainService.rejectTicket(id, body.get("note"), actorId);
   }
 
+  @GetMapping("/{id}/comments")
+  @PreAuthorize("isAuthenticated()")
+  public Map<String, Object> getComments(@PathVariable UUID id) {
+    var pageable = PageRequest.of(0, 200, Sort.by(Sort.Direction.ASC, "createdAt"));
+    var comments =
+        ticketCommentsRepository
+            .findAllByTicketIdAndIsDeletedFalse(id, pageable)
+            .stream()
+            .map(
+                c ->
+                    Map.of(
+                        "id", c.getId(),
+                        "userId", c.getUserId() != null ? c.getUserId() : "",
+                        "userName", c.getUserName() != null ? c.getUserName() : "",
+                        "role", c.getRole() != null ? c.getRole() : "",
+                        "message", c.getMessage() != null ? c.getMessage() : "",
+                        "createdAt", c.getCreatedAt() != null ? c.getCreatedAt() : ""))
+            .toList();
+    return Map.of("comments", comments);
+  }
+
   @PostMapping("/{id}/comments")
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("isAuthenticated()")
@@ -92,12 +158,16 @@ public class TicketsController {
       @PathVariable UUID id,
       @Valid @RequestBody AddCommentRequest request,
       @CurrentUserId UUID actorId) {
-    return ticketDomainService.addComment(
-        id, request.message(), actorId, request.userName(), request.role());
+    UsersEntity actor =
+        usersRepository
+            .findById(actorId)
+            .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "USER_NOT_FOUND"));
+    String userName = actor.getName() != null ? actor.getName() : "User";
+    String role = actor.getRole() != null ? actor.getRole().name() : "shopper";
+    return ticketDomainService.addComment(id, request.message(), actorId, userName, role);
   }
 
-  public record AddCommentRequest(
-      @NotBlank @Size(max = 2000) String message,
-      @NotBlank String userName,
-      @NotBlank String role) {}
+  public record AddCommentRequest(@NotBlank @Size(max = 2000) String message) {}
+
+  public record UpdateTicketRequest(String status, Boolean escalate, String resolutionNote) {}
 }
