@@ -4,14 +4,21 @@ import com.coddicted.buzzma.ops.service.OpsService;
 import com.coddicted.buzzma.catalog.api.CampaignsResponseDto;
 import com.coddicted.buzzma.catalog.api.DealsResponseDto;
 import com.coddicted.buzzma.identity.api.UsersResponseDto;
+import com.coddicted.buzzma.identity.persistence.InvitesEntity;
+import com.coddicted.buzzma.identity.persistence.InvitesRepository;
+import com.coddicted.buzzma.identity.persistence.UsersEntity;
 import com.coddicted.buzzma.identity.persistence.UsersRepository;
 import com.coddicted.buzzma.orders.api.OrdersResponseDto;
+import com.coddicted.buzzma.shared.enums.UserRole;
+import com.coddicted.buzzma.shared.exception.ApiException;
 import com.coddicted.buzzma.shared.security.CurrentUserId;
 import com.coddicted.buzzma.wallet.api.PayoutsResponseDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,10 +43,12 @@ public class OpsController {
 
   private final OpsService opsService;
   private final UsersRepository usersRepository;
+  private final InvitesRepository invitesRepository;
 
-  public OpsController(OpsService opsService, UsersRepository usersRepository) {
+  public OpsController(OpsService opsService, UsersRepository usersRepository, InvitesRepository invitesRepository) {
     this.opsService = opsService;
     this.usersRepository = usersRepository;
+    this.invitesRepository = invitesRepository;
   }
 
   // ── Campaign CRUD ─────────────────────────────────────────────────────────────
@@ -102,7 +112,7 @@ public class OpsController {
     return result;
   }
 
-  @PostMapping("/campaigns/{campaignId}/status")
+  @RequestMapping(value = "/campaigns/{campaignId}/status", method = {RequestMethod.POST, RequestMethod.PATCH})
   @PreAuthorize("hasAnyRole('ops','admin','agency')")
   public CampaignsResponseDto updateCampaignStatus(
       @PathVariable UUID campaignId,
@@ -505,6 +515,104 @@ public class OpsController {
   @PreAuthorize("hasAnyRole('ops','admin','agency')")
   public List<Map<String, Object>> getBrandPerformance(@RequestParam String agencyCode) {
     return opsService.getBrandPerformance(agencyCode);
+  }
+
+  // ── Invites ───────────────────────────────────────────────────────────────────
+
+  @PostMapping("/invites/generate")
+  @ResponseStatus(HttpStatus.CREATED)
+  public Map<String, Object> generateMediatorInvite(
+      @RequestBody Map<String, Object> body, @CurrentUserId UUID actorUserId) {
+    Object agencyIdVal = body.get("agencyId");
+    if (agencyIdVal == null || String.valueOf(agencyIdVal).isBlank()) {
+      throw new ApiException(org.springframework.http.HttpStatus.BAD_REQUEST, "MISSING_AGENCY_ID");
+    }
+    UUID agencyId = UUID.fromString(String.valueOf(agencyIdVal));
+
+    UsersEntity requester = usersRepository.findById(actorUserId)
+        .orElseThrow(() -> new ApiException(org.springframework.http.HttpStatus.UNAUTHORIZED, "UNAUTHENTICATED"));
+
+    String[] requesterRoles = requester.getRoles() != null ? requester.getRoles() : new String[0];
+    boolean isPrivileged = Arrays.asList(requesterRoles).contains("admin") || Arrays.asList(requesterRoles).contains("ops");
+    boolean isAgencySelf = Arrays.asList(requesterRoles).contains("agency") && actorUserId.equals(agencyId);
+    if (!isAgencySelf && !isPrivileged) {
+      throw new ApiException(org.springframework.http.HttpStatus.FORBIDDEN, "FORBIDDEN");
+    }
+
+    UsersEntity agency = usersRepository.findById(agencyId)
+        .filter(u -> !Boolean.TRUE.equals(u.getIsDeleted()))
+        .filter(u -> u.getRoles() != null && Arrays.asList(u.getRoles()).contains("agency"))
+        .orElseThrow(() -> new ApiException(org.springframework.http.HttpStatus.NOT_FOUND, "AGENCY_NOT_FOUND"));
+
+    String parentCode = agency.getMediatorCode();
+    if (parentCode == null || parentCode.isBlank()) {
+      parentCode = "AGY-" + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
+      agency.setMediatorCode(parentCode);
+      usersRepository.save(agency);
+    }
+
+    String code = generateUniqueInviteCode("INV");
+    InvitesEntity invite = new InvitesEntity();
+    invite.setCode(code);
+    invite.setRole(UserRole.mediator);
+    invite.setParentUserId(agency.getId());
+    invite.setParentCode(parentCode);
+    invite.setCreatedBy(actorUserId);
+    invite.setExpiresAt(Instant.now().plusSeconds(60L * 60 * 24 * 14));
+    invitesRepository.save(invite);
+
+    return Map.of("code", code);
+  }
+
+  @PostMapping("/invites/generate-buyer")
+  @ResponseStatus(HttpStatus.CREATED)
+  public Map<String, Object> generateBuyerInvite(
+      @RequestBody Map<String, Object> body, @CurrentUserId UUID actorUserId) {
+    Object mediatorIdVal = body.get("mediatorId");
+    if (mediatorIdVal == null || String.valueOf(mediatorIdVal).isBlank()) {
+      throw new ApiException(org.springframework.http.HttpStatus.BAD_REQUEST, "MISSING_MEDIATOR_ID");
+    }
+    UUID mediatorId = UUID.fromString(String.valueOf(mediatorIdVal));
+
+    UsersEntity requester = usersRepository.findById(actorUserId)
+        .orElseThrow(() -> new ApiException(org.springframework.http.HttpStatus.UNAUTHORIZED, "UNAUTHENTICATED"));
+
+    String[] requesterRoles = requester.getRoles() != null ? requester.getRoles() : new String[0];
+    boolean isPrivileged = Arrays.asList(requesterRoles).contains("admin") || Arrays.asList(requesterRoles).contains("ops");
+    boolean isMediatorSelf = Arrays.asList(requesterRoles).contains("mediator") && actorUserId.equals(mediatorId);
+    if (!isMediatorSelf && !isPrivileged) {
+      throw new ApiException(org.springframework.http.HttpStatus.FORBIDDEN, "FORBIDDEN");
+    }
+
+    UsersEntity mediator = usersRepository.findById(mediatorId)
+        .filter(u -> !Boolean.TRUE.equals(u.getIsDeleted()))
+        .filter(u -> u.getRoles() != null && Arrays.asList(u.getRoles()).contains("mediator"))
+        .orElseThrow(() -> new ApiException(org.springframework.http.HttpStatus.NOT_FOUND, "MEDIATOR_NOT_FOUND"));
+
+    String parentCode = mediator.getMediatorCode();
+    if (parentCode == null || parentCode.isBlank()) {
+      throw new ApiException(org.springframework.http.HttpStatus.CONFLICT, "MISSING_MEDIATOR_CODE");
+    }
+
+    String code = generateUniqueInviteCode("INV");
+    InvitesEntity invite = new InvitesEntity();
+    invite.setCode(code);
+    invite.setRole(UserRole.shopper);
+    invite.setParentUserId(mediator.getId());
+    invite.setParentCode(parentCode);
+    invite.setCreatedBy(actorUserId);
+    invite.setExpiresAt(Instant.now().plusSeconds(60L * 60 * 24 * 14));
+    invitesRepository.save(invite);
+
+    return Map.of("code", code);
+  }
+
+  private String generateUniqueInviteCode(String prefix) {
+    for (int i = 0; i < 10; i++) {
+      String candidate = prefix + "-" + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
+      if (!invitesRepository.existsByCode(candidate)) return candidate;
+    }
+    throw new ApiException(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR, "CODE_GENERATION_FAILED");
   }
 
   // ── Connections ───────────────────────────────────────────────────────────────

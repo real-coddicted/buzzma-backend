@@ -15,6 +15,8 @@ public interface InvitesRepository extends JpaRepository<InvitesEntity, UUID> {
 
   Optional<InvitesEntity> findByCode(String code);
 
+  boolean existsByCode(String code);
+
   Page<InvitesEntity> findAll(Pageable pageable);
 
   @Modifying
