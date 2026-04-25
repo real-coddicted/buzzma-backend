@@ -103,9 +103,7 @@ public class OrderQueryAdapter implements OrderQueryPort {
   @Transactional(readOnly = true)
   public List<Map<String, Object>> findTopBrandsByOrderCount(List<String> managerNames) {
     if (managerNames == null || managerNames.isEmpty()) return List.of();
-    return ordersRepository
-        .findTopBrandsByOrderCount(managerNames.toArray(new String[0]))
-        .stream()
+    return ordersRepository.findTopBrandsByOrderCount(managerNames.toArray(new String[0])).stream()
         .map(
             row -> {
               Map<String, Object> m = new HashMap<>();

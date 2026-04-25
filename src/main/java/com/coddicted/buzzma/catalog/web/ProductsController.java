@@ -72,8 +72,12 @@ public class ProductsController {
                   p.put("brandName", d.getBrandName());
                   p.put("dealType", d.getDealType() != null ? d.getDealType().name() : "Rating");
                   p.put("price", d.getPricePaise() != null ? d.getPricePaise() / 100.0 : 0);
-                  p.put("originalPrice", d.getOriginalPricePaise() != null ? d.getOriginalPricePaise() / 100.0 : 0);
-                  p.put("commission", d.getCommissionPaise() != null ? d.getCommissionPaise() / 100.0 : 0);
+                  p.put(
+                      "originalPrice",
+                      d.getOriginalPricePaise() != null ? d.getOriginalPricePaise() / 100.0 : 0);
+                  p.put(
+                      "commission",
+                      d.getCommissionPaise() != null ? d.getCommissionPaise() / 100.0 : 0);
                   p.put("rating", d.getRating() != null ? d.getRating() : 5.0);
                   p.put("category", d.getCategory() != null ? d.getCategory() : "General");
                   p.put("active", d.getActive());

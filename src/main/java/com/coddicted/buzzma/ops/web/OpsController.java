@@ -1,6 +1,5 @@
 package com.coddicted.buzzma.ops.web;
 
-import com.coddicted.buzzma.ops.service.OpsService;
 import com.coddicted.buzzma.catalog.api.CampaignsResponseDto;
 import com.coddicted.buzzma.catalog.api.DealsResponseDto;
 import com.coddicted.buzzma.identity.api.UsersResponseDto;
@@ -8,6 +7,7 @@ import com.coddicted.buzzma.identity.persistence.InvitesEntity;
 import com.coddicted.buzzma.identity.persistence.InvitesRepository;
 import com.coddicted.buzzma.identity.persistence.UsersEntity;
 import com.coddicted.buzzma.identity.persistence.UsersRepository;
+import com.coddicted.buzzma.ops.service.OpsService;
 import com.coddicted.buzzma.orders.api.OrdersResponseDto;
 import com.coddicted.buzzma.shared.enums.UserRole;
 import com.coddicted.buzzma.shared.exception.ApiException;
@@ -45,7 +45,8 @@ public class OpsController {
   private final UsersRepository usersRepository;
   private final InvitesRepository invitesRepository;
 
-  public OpsController(OpsService opsService, UsersRepository usersRepository, InvitesRepository invitesRepository) {
+  public OpsController(
+      OpsService opsService, UsersRepository usersRepository, InvitesRepository invitesRepository) {
     this.opsService = opsService;
     this.usersRepository = usersRepository;
     this.invitesRepository = invitesRepository;
@@ -87,8 +88,9 @@ public class OpsController {
   public Map<String, Object> copyCampaign(
       @RequestBody Map<String, Object> body, @CurrentUserId UUID actorUserId) {
     Object idVal = body.get("id");
-    if (idVal == null) throw new com.coddicted.buzzma.shared.exception.ApiException(
-        org.springframework.http.HttpStatus.BAD_REQUEST, "MISSING_ID");
+    if (idVal == null)
+      throw new com.coddicted.buzzma.shared.exception.ApiException(
+          org.springframework.http.HttpStatus.BAD_REQUEST, "MISSING_ID");
     UUID campaignId = UUID.fromString(String.valueOf(idVal));
     CampaignsResponseDto c = opsService.copyCampaign(campaignId, actorUserId);
 
@@ -112,7 +114,9 @@ public class OpsController {
     return result;
   }
 
-  @RequestMapping(value = "/campaigns/{campaignId}/status", method = {RequestMethod.POST, RequestMethod.PATCH})
+  @RequestMapping(
+      value = "/campaigns/{campaignId}/status",
+      method = {RequestMethod.POST, RequestMethod.PATCH})
   @PreAuthorize("hasAnyRole('ops','admin','agency')")
   public CampaignsResponseDto updateCampaignStatus(
       @PathVariable UUID campaignId,
@@ -141,16 +145,16 @@ public class OpsController {
   @PostMapping("/campaigns/assign")
   @PreAuthorize("isAuthenticated()")
   public Map<String, Object> assignSlotsFlat(
-      @RequestBody Map<String, Object> body,
-      @CurrentUserId UUID actorUserId) {
+      @RequestBody Map<String, Object> body, @CurrentUserId UUID actorUserId) {
     Object idVal = body.get("id");
-    if (idVal == null) throw new com.coddicted.buzzma.shared.exception.ApiException(
-        org.springframework.http.HttpStatus.BAD_REQUEST, "MISSING_ID");
+    if (idVal == null)
+      throw new com.coddicted.buzzma.shared.exception.ApiException(
+          org.springframework.http.HttpStatus.BAD_REQUEST, "MISSING_ID");
     UUID campaignId = UUID.fromString(String.valueOf(idVal));
 
     @SuppressWarnings("unchecked")
-    Map<String, Object> assignments = body.get("assignments") instanceof Map<?, ?> m
-        ? (Map<String, Object>) m : Map.of();
+    Map<String, Object> assignments =
+        body.get("assignments") instanceof Map<?, ?> m ? (Map<String, Object>) m : Map.of();
 
     opsService.assignSlots(campaignId, assignments, actorUserId);
     return Map.of("ok", true);
@@ -173,14 +177,15 @@ public class OpsController {
   private String resolveCode(String paramCode, UUID actorId) {
     if (paramCode != null && !paramCode.isBlank()) return paramCode;
     if (actorId == null) return null;
-    return usersRepository.findById(actorId)
+    return usersRepository
+        .findById(actorId)
         .map(u -> u.getMediatorCode() != null ? u.getMediatorCode() : u.getParentCode())
         .orElse(null);
   }
 
   static Map<String, Object> toUiCampaign(CampaignsResponseDto c, String requesterMediatorCode) {
-    Map<String, Object> statusMap = Map.of(
-        "active", "Active", "paused", "Paused", "completed", "Completed", "draft", "Draft");
+    Map<String, Object> statusMap =
+        Map.of("active", "Active", "paused", "Paused", "completed", "Completed", "draft", "Draft");
 
     // Parse assignments JSONB string into a map
     Map<String, Object> assignmentsRaw = new java.util.LinkedHashMap<>();
@@ -188,9 +193,11 @@ public class OpsController {
     Map<String, Object> assignmentDetails = new java.util.LinkedHashMap<>();
     if (c.getAssignments() != null && !c.getAssignments().isBlank()) {
       try {
-        assignmentsRaw = new com.fasterxml.jackson.databind.ObjectMapper()
-            .readValue(c.getAssignments(), Map.class);
-      } catch (Exception ignored) {}
+        assignmentsRaw =
+            new com.fasterxml.jackson.databind.ObjectMapper()
+                .readValue(c.getAssignments(), Map.class);
+      } catch (Exception ignored) {
+      }
     }
     int payoutPaise = c.getPayoutPaise() != null ? c.getPayoutPaise() : 0;
     for (Map.Entry<String, Object> entry : assignmentsRaw.entrySet()) {
@@ -216,7 +223,9 @@ public class OpsController {
       } else {
         assignments.put(code, 0);
         Map<String, Object> det = new java.util.LinkedHashMap<>();
-        det.put("limit", 0); det.put("payout", payoutPaise / 100.0); det.put("commission", 0);
+        det.put("limit", 0);
+        det.put("payout", payoutPaise / 100.0);
+        det.put("commission", 0);
         assignmentDetails.put(code, det);
       }
     }
@@ -228,18 +237,23 @@ public class OpsController {
     m.put("brandId", c.getBrandUserId() != null ? c.getBrandUserId().toString() : "");
     m.put("platform", c.getPlatform() != null ? c.getPlatform() : "");
     m.put("price", c.getPricePaise() != null ? c.getPricePaise() / 100.0 : 0);
-    m.put("originalPrice", c.getOriginalPricePaise() != null ? c.getOriginalPricePaise() / 100.0 : 0);
+    m.put(
+        "originalPrice", c.getOriginalPricePaise() != null ? c.getOriginalPricePaise() / 100.0 : 0);
     m.put("payout", payoutPaise / 100.0);
     m.put("image", c.getImage() != null ? c.getImage() : "");
     m.put("productUrl", c.getProductUrl() != null ? c.getProductUrl() : "");
     m.put("totalSlots", c.getTotalSlots() != null ? c.getTotalSlots() : 0);
     m.put("usedSlots", c.getUsedSlots() != null ? c.getUsedSlots() : 0);
-    m.put("status", statusMap.getOrDefault(
-        c.getStatus() != null ? c.getStatus().toLowerCase() : "", "Draft"));
+    m.put(
+        "status",
+        statusMap.getOrDefault(c.getStatus() != null ? c.getStatus().toLowerCase() : "", "Draft"));
     m.put("assignments", assignments);
     m.put("assignmentDetails", assignmentDetails);
-    m.put("allowedAgencies", c.getAllowedAgencies() != null ? c.getAllowedAgencies() : new String[0]);
-    m.put("createdAt", c.getCreatedAt() != null ? c.getCreatedAt().toEpochMilli() : System.currentTimeMillis());
+    m.put(
+        "allowedAgencies", c.getAllowedAgencies() != null ? c.getAllowedAgencies() : new String[0]);
+    m.put(
+        "createdAt",
+        c.getCreatedAt() != null ? c.getCreatedAt().toEpochMilli() : System.currentTimeMillis());
     m.put("returnWindowDays", c.getReturnWindowDays() != null ? c.getReturnWindowDays() : 14);
     m.put("dealType", c.getDealType() != null ? c.getDealType() : "");
     m.put("openToAll", Boolean.TRUE.equals(c.getOpenToAll()));
@@ -263,8 +277,10 @@ public class OpsController {
   @ResponseStatus(HttpStatus.CREATED)
   public Map<String, Object> publishDeal(
       @Valid @RequestBody PublishDealRequest req, @CurrentUserId UUID actorUserId) {
-    int commissionPaise = (int) Math.round((req.commission() != null ? req.commission() : 0.0) * 100);
-    return toUiDeal(opsService.publishDeal(req.id(), req.mediatorCode(), commissionPaise, actorUserId));
+    int commissionPaise =
+        (int) Math.round((req.commission() != null ? req.commission() : 0.0) * 100);
+    return toUiDeal(
+        opsService.publishDeal(req.id(), req.mediatorCode(), commissionPaise, actorUserId));
   }
 
   @PostMapping("/deals/{dealId}/decline")
@@ -281,12 +297,11 @@ public class OpsController {
       @RequestParam(defaultValue = "50") int limit,
       @RequestParam(defaultValue = "0") int offset,
       @CurrentUserId UUID actorId) {
-    List<String> codes = (mediatorCodes != null && !mediatorCodes.isEmpty())
-        ? mediatorCodes
-        : resolveCode(null, actorId) != null ? List.of(resolveCode(null, actorId)) : List.of();
-    return opsService.getDeals(codes, limit, offset).stream()
-        .map(OpsController::toUiDeal)
-        .toList();
+    List<String> codes =
+        (mediatorCodes != null && !mediatorCodes.isEmpty())
+            ? mediatorCodes
+            : resolveCode(null, actorId) != null ? List.of(resolveCode(null, actorId)) : List.of();
+    return opsService.getDeals(codes, limit, offset).stream().map(OpsController::toUiDeal).toList();
   }
 
   static Map<String, Object> toUiDeal(DealsResponseDto d) {
@@ -297,7 +312,8 @@ public class OpsController {
     m.put("title", d.getTitle() != null ? d.getTitle() : "");
     m.put("description", d.getDescription() != null ? d.getDescription() : "Exclusive");
     m.put("price", d.getPricePaise() != null ? d.getPricePaise() / 100.0 : 0);
-    m.put("originalPrice", d.getOriginalPricePaise() != null ? d.getOriginalPricePaise() / 100.0 : 0);
+    m.put(
+        "originalPrice", d.getOriginalPricePaise() != null ? d.getOriginalPricePaise() / 100.0 : 0);
     m.put("commission", d.getCommissionPaise() != null ? d.getCommissionPaise() / 100.0 : 0);
     m.put("image", d.getImage() != null ? d.getImage() : "");
     m.put("productUrl", d.getProductUrl() != null ? d.getProductUrl() : "");
@@ -529,24 +545,38 @@ public class OpsController {
     }
     UUID agencyId = UUID.fromString(String.valueOf(agencyIdVal));
 
-    UsersEntity requester = usersRepository.findById(actorUserId)
-        .orElseThrow(() -> new ApiException(org.springframework.http.HttpStatus.UNAUTHORIZED, "UNAUTHENTICATED"));
+    UsersEntity requester =
+        usersRepository
+            .findById(actorUserId)
+            .orElseThrow(
+                () ->
+                    new ApiException(
+                        org.springframework.http.HttpStatus.UNAUTHORIZED, "UNAUTHENTICATED"));
 
     String[] requesterRoles = requester.getRoles() != null ? requester.getRoles() : new String[0];
-    boolean isPrivileged = Arrays.asList(requesterRoles).contains("admin") || Arrays.asList(requesterRoles).contains("ops");
-    boolean isAgencySelf = Arrays.asList(requesterRoles).contains("agency") && actorUserId.equals(agencyId);
+    boolean isPrivileged =
+        Arrays.asList(requesterRoles).contains("admin")
+            || Arrays.asList(requesterRoles).contains("ops");
+    boolean isAgencySelf =
+        Arrays.asList(requesterRoles).contains("agency") && actorUserId.equals(agencyId);
     if (!isAgencySelf && !isPrivileged) {
       throw new ApiException(org.springframework.http.HttpStatus.FORBIDDEN, "FORBIDDEN");
     }
 
-    UsersEntity agency = usersRepository.findById(agencyId)
-        .filter(u -> !Boolean.TRUE.equals(u.getIsDeleted()))
-        .filter(u -> u.getRoles() != null && Arrays.asList(u.getRoles()).contains("agency"))
-        .orElseThrow(() -> new ApiException(org.springframework.http.HttpStatus.NOT_FOUND, "AGENCY_NOT_FOUND"));
+    UsersEntity agency =
+        usersRepository
+            .findById(agencyId)
+            .filter(u -> !Boolean.TRUE.equals(u.getIsDeleted()))
+            .filter(u -> u.getRoles() != null && Arrays.asList(u.getRoles()).contains("agency"))
+            .orElseThrow(
+                () ->
+                    new ApiException(
+                        org.springframework.http.HttpStatus.NOT_FOUND, "AGENCY_NOT_FOUND"));
 
     String parentCode = agency.getMediatorCode();
     if (parentCode == null || parentCode.isBlank()) {
-      parentCode = "AGY-" + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
+      parentCode =
+          "AGY-" + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
       agency.setMediatorCode(parentCode);
       usersRepository.save(agency);
     }
@@ -570,24 +600,38 @@ public class OpsController {
       @RequestBody Map<String, Object> body, @CurrentUserId UUID actorUserId) {
     Object mediatorIdVal = body.get("mediatorId");
     if (mediatorIdVal == null || String.valueOf(mediatorIdVal).isBlank()) {
-      throw new ApiException(org.springframework.http.HttpStatus.BAD_REQUEST, "MISSING_MEDIATOR_ID");
+      throw new ApiException(
+          org.springframework.http.HttpStatus.BAD_REQUEST, "MISSING_MEDIATOR_ID");
     }
     UUID mediatorId = UUID.fromString(String.valueOf(mediatorIdVal));
 
-    UsersEntity requester = usersRepository.findById(actorUserId)
-        .orElseThrow(() -> new ApiException(org.springframework.http.HttpStatus.UNAUTHORIZED, "UNAUTHENTICATED"));
+    UsersEntity requester =
+        usersRepository
+            .findById(actorUserId)
+            .orElseThrow(
+                () ->
+                    new ApiException(
+                        org.springframework.http.HttpStatus.UNAUTHORIZED, "UNAUTHENTICATED"));
 
     String[] requesterRoles = requester.getRoles() != null ? requester.getRoles() : new String[0];
-    boolean isPrivileged = Arrays.asList(requesterRoles).contains("admin") || Arrays.asList(requesterRoles).contains("ops");
-    boolean isMediatorSelf = Arrays.asList(requesterRoles).contains("mediator") && actorUserId.equals(mediatorId);
+    boolean isPrivileged =
+        Arrays.asList(requesterRoles).contains("admin")
+            || Arrays.asList(requesterRoles).contains("ops");
+    boolean isMediatorSelf =
+        Arrays.asList(requesterRoles).contains("mediator") && actorUserId.equals(mediatorId);
     if (!isMediatorSelf && !isPrivileged) {
       throw new ApiException(org.springframework.http.HttpStatus.FORBIDDEN, "FORBIDDEN");
     }
 
-    UsersEntity mediator = usersRepository.findById(mediatorId)
-        .filter(u -> !Boolean.TRUE.equals(u.getIsDeleted()))
-        .filter(u -> u.getRoles() != null && Arrays.asList(u.getRoles()).contains("mediator"))
-        .orElseThrow(() -> new ApiException(org.springframework.http.HttpStatus.NOT_FOUND, "MEDIATOR_NOT_FOUND"));
+    UsersEntity mediator =
+        usersRepository
+            .findById(mediatorId)
+            .filter(u -> !Boolean.TRUE.equals(u.getIsDeleted()))
+            .filter(u -> u.getRoles() != null && Arrays.asList(u.getRoles()).contains("mediator"))
+            .orElseThrow(
+                () ->
+                    new ApiException(
+                        org.springframework.http.HttpStatus.NOT_FOUND, "MEDIATOR_NOT_FOUND"));
 
     String parentCode = mediator.getMediatorCode();
     if (parentCode == null || parentCode.isBlank()) {
@@ -609,10 +653,14 @@ public class OpsController {
 
   private String generateUniqueInviteCode(String prefix) {
     for (int i = 0; i < 10; i++) {
-      String candidate = prefix + "-" + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
+      String candidate =
+          prefix
+              + "-"
+              + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
       if (!invitesRepository.existsByCode(candidate)) return candidate;
     }
-    throw new ApiException(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR, "CODE_GENERATION_FAILED");
+    throw new ApiException(
+        org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR, "CODE_GENERATION_FAILED");
   }
 
   // ── Connections ───────────────────────────────────────────────────────────────
@@ -668,7 +716,8 @@ public class OpsController {
     }
   }
 
-  public record PublishDealRequest(@NotNull UUID id, @NotBlank String mediatorCode, Double commission) {}
+  public record PublishDealRequest(
+      @NotNull UUID id, @NotBlank String mediatorCode, Double commission) {}
 
   public record VerifyRequirementRequest(@NotNull UUID orderId, @NotBlank String type) {}
 

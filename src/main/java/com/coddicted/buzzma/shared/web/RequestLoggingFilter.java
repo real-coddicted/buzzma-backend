@@ -143,11 +143,15 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
   }
 
   private String extractRequestBody(ContentCachingRequestWrapper request) {
-    return extractBody(request.getContentAsByteArray(), request.getContentType(), request.getCharacterEncoding());
+    return extractBody(
+        request.getContentAsByteArray(), request.getContentType(), request.getCharacterEncoding());
   }
 
   private String extractResponseBody(ContentCachingResponseWrapper response) {
-    return extractBody(response.getContentAsByteArray(), response.getContentType(), response.getCharacterEncoding());
+    return extractBody(
+        response.getContentAsByteArray(),
+        response.getContentType(),
+        response.getCharacterEncoding());
   }
 
   private String extractBody(byte[] body, String contentType, String encoding) {
@@ -191,4 +195,3 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
     }
   }
 }
-

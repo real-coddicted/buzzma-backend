@@ -63,8 +63,7 @@ public class AiChatController {
 
   @PostMapping("/chat")
   @PreAuthorize("isAuthenticated()")
-  public Map<String, Object> chat(
-      @RequestBody ChatRequest request, @CurrentUserId UUID actorId) {
+  public Map<String, Object> chat(@RequestBody ChatRequest request, @CurrentUserId UUID actorId) {
 
     String rawMessage = request.message() != null ? request.message().trim() : "";
     String msg = rawMessage.toLowerCase();
@@ -106,25 +105,47 @@ public class AiChatController {
         List<Map<String, Object>> sorted = new ArrayList<>(products);
         sorted.sort((a, b) -> Double.compare(toDouble(a.get("price")), toDouble(b.get("price"))));
         int take = count > 0 ? count : 1;
-        String text = take == 1 ? "Here is the lowest priced deal." : "Here are the lowest " + take + " deals.";
-        return Map.of("text", text, "intent", "search_deals", "uiType", "product_card",
-            "data", sorted.subList(0, Math.min(take, sorted.size())));
+        String text =
+            take == 1
+                ? "Here is the lowest priced deal."
+                : "Here are the lowest " + take + " deals.";
+        return Map.of(
+            "text",
+            text,
+            "intent",
+            "search_deals",
+            "uiType",
+            "product_card",
+            "data",
+            sorted.subList(0, Math.min(take, sorted.size())));
       }
       if (wantsDeals) {
         int take = count > 0 ? count : 5;
-        return Map.of("text", "Here are the top " + take + " deals for you.",
-            "intent", "search_deals", "uiType", "product_card",
-            "data", products.subList(0, Math.min(take, products.size())));
+        return Map.of(
+            "text",
+            "Here are the top " + take + " deals for you.",
+            "intent",
+            "search_deals",
+            "uiType",
+            "product_card",
+            "data",
+            products.subList(0, Math.min(take, products.size())));
       }
     } else if (msg.contains("deal") || msg.contains("loot")) {
-      return Map.of("text", "I could not find any active deals for your mediator right now.",
-          "intent", "search_deals");
+      return Map.of(
+          "text",
+          "I could not find any active deals for your mediator right now.",
+          "intent",
+          "search_deals");
     }
 
-    if (msg.contains("what is") || msg.contains("explain")
-        || msg.contains("how it works") || msg.contains("system")) {
+    if (msg.contains("what is")
+        || msg.contains("explain")
+        || msg.contains("how it works")
+        || msg.contains("system")) {
       return Map.of(
-          "text", "BUZZMA connects buyers to mediator‑published deals. You can explore deals, place orders, submit proofs, and track cashback. Ask me about **deals**, **orders**, or **tickets** anytime.",
+          "text",
+              "BUZZMA connects buyers to mediator‑published deals. You can explore deals, place orders, submit proofs, and track cashback. Ask me about **deals**, **orders**, or **tickets** anytime.",
           "intent", "unknown");
     }
 
@@ -132,38 +153,69 @@ public class AiChatController {
       if (hasOrders) {
         Map<String, Object> latest = request.orders().get(0);
         return Map.of(
-            "text", "Your latest order is **" + str(latest.get("status"), "Pending") + "**. "
-                + "Payment: **" + str(latest.get("paymentStatus"), "Pending") + "**, "
-                + "Affiliate: **" + str(latest.get("affiliateStatus"), "Unchecked") + "**.",
-            "intent", "check_order_status");
+            "text",
+            "Your latest order is **"
+                + str(latest.get("status"), "Pending")
+                + "**. "
+                + "Payment: **"
+                + str(latest.get("paymentStatus"), "Pending")
+                + "**, "
+                + "Affiliate: **"
+                + str(latest.get("affiliateStatus"), "Unchecked")
+                + "**.",
+            "intent",
+            "check_order_status");
       }
-      return Map.of("text", "I could not find any orders yet. Want to explore deals?",
-          "intent", "check_order_status");
+      return Map.of(
+          "text",
+          "I could not find any orders yet. Want to explore deals?",
+          "intent",
+          "check_order_status");
     }
 
     if (msg.contains("ticket") || msg.contains("support")) {
       if (hasTickets) {
-        Map<String, Object> latest = request.tickets().stream()
-            .filter(t -> !"Feedback".equals(t.get("issueType")))
-            .findFirst().orElse(null);
+        Map<String, Object> latest =
+            request.tickets().stream()
+                .filter(t -> !"Feedback".equals(t.get("issueType")))
+                .findFirst()
+                .orElse(null);
         if (latest != null) {
           return Map.of(
-              "text", "Your latest ticket (**" + str(latest.get("issueType"), "Support")
-                  + "**) is **" + str(latest.get("status"), "Open") + "**.",
-              "intent", "check_ticket_status");
+              "text",
+              "Your latest ticket (**"
+                  + str(latest.get("issueType"), "Support")
+                  + "**) is **"
+                  + str(latest.get("status"), "Open")
+                  + "**.",
+              "intent",
+              "check_ticket_status");
         }
       }
-      return Map.of("text", "No tickets found. You can create one from the Tickets tab.",
-          "intent", "check_ticket_status");
+      return Map.of(
+          "text",
+          "No tickets found. You can create one from the Tickets tab.",
+          "intent",
+          "check_ticket_status");
     }
 
     if (msg.contains("profile") || msg.contains("wallet")) {
-      return Map.of("text", "Opening your **Profile & Wallet**.", "intent", "navigation",
-          "navigateTo", "profile");
+      return Map.of(
+          "text",
+          "Opening your **Profile & Wallet**.",
+          "intent",
+          "navigation",
+          "navigateTo",
+          "profile");
     }
     if (msg.contains("explore") || msg.contains("home")) {
-      return Map.of("text", "Taking you to **Explore Deals**.", "intent", "navigation",
-          "navigateTo", msg.contains("home") ? "home" : "explore");
+      return Map.of(
+          "text",
+          "Taking you to **Explore Deals**.",
+          "intent",
+          "navigation",
+          "navigateTo",
+          msg.contains("home") ? "home" : "explore");
     }
 
     // ── Gemini fallback ──────────────────────────────────────────────────────
@@ -178,16 +230,18 @@ public class AiChatController {
     }
 
     return Map.of(
-        "text", "I’m here to help! You can ask me about **deals**, **orders**, **tickets**, or **your profile**.",
+        "text",
+            "I’m here to help! You can ask me about **deals**, **orders**, **tickets**, or **your profile**.",
         "intent", "unknown");
   }
 
   private Map<String, Object> callGemini(
       ChatRequest request, List<Map<String, Object>> products, String message) throws Exception {
 
-    String rawUserName = request.userName() != null
-        ? request.userName().replaceAll("[\n\r\t{}\\[\\]<>]", "").strip()
-        : "Guest";
+    String rawUserName =
+        request.userName() != null
+            ? request.userName().replaceAll("[\n\r\t{}\\[\\]<>]", "").strip()
+            : "Guest";
     String userName = rawUserName.substring(0, Math.min(60, rawUserName.length()));
     if (userName.isBlank()) userName = "Guest";
 
@@ -195,26 +249,39 @@ public class AiChatController {
     StringBuilder dealContext = new StringBuilder();
     for (int i = 0; i < Math.min(10, products.size()); i++) {
       Map<String, Object> p = products.get(i);
-      dealContext.append("[ID: ").append(p.get("id")).append("] ")
-          .append(p.get("title")).append(" - Price: ₹").append(toDouble(p.get("price")))
-          .append(" on ").append(p.get("platform")).append("\n");
+      dealContext
+          .append("[ID: ")
+          .append(p.get("id"))
+          .append("] ")
+          .append(p.get("title"))
+          .append(" - Price: ₹")
+          .append(toDouble(p.get("price")))
+          .append(" on ")
+          .append(p.get("platform"))
+          .append("\n");
     }
 
-    String ordersJson = objectMapper.writeValueAsString(
-        request.orders() != null ? request.orders().subList(0, Math.min(3, request.orders().size())) : List.of());
-    String ticketsJson = objectMapper.writeValueAsString(
-        request.tickets() != null ? request.tickets().subList(0, Math.min(2, request.tickets().size())) : List.of());
+    String ordersJson =
+        objectMapper.writeValueAsString(
+            request.orders() != null
+                ? request.orders().subList(0, Math.min(3, request.orders().size()))
+                : List.of());
+    String ticketsJson =
+        objectMapper.writeValueAsString(
+            request.tickets() != null
+                ? request.tickets().subList(0, Math.min(2, request.tickets().size()))
+                : List.of());
 
     boolean hasImage = request.image() != null && !request.image().isBlank();
 
-    String systemPrompt = buildSystemPrompt(userName, dealContext.toString(), ordersJson, ticketsJson, hasImage);
+    String systemPrompt =
+        buildSystemPrompt(userName, dealContext.toString(), ordersJson, ticketsJson, hasImage);
 
     // Build contents array
     List<Map<String, Object>> contentParts = new ArrayList<>();
     if (hasImage) {
-      String imageData = request.image().contains(",")
-          ? request.image().split(",", 2)[1]
-          : request.image();
+      String imageData =
+          request.image().contains(",") ? request.image().split(",", 2)[1] : request.image();
       contentParts.add(Map.of("inlineData", Map.of("mimeType", "image/jpeg", "data", imageData)));
       contentParts.add(Map.of("text", message.isEmpty() ? "Analyze this image." : message));
     } else {
@@ -226,12 +293,12 @@ public class AiChatController {
       contentParts.add(Map.of("text", message.isEmpty() ? "Hello" : message));
     }
 
-    Map<String, Object> body = Map.of(
-        "system_instruction", Map.of("parts", List.of(Map.of("text", systemPrompt))),
-        "contents", List.of(Map.of("parts", contentParts)),
-        "generationConfig", Map.of(
-            "maxOutputTokens", 512,
-            "responseMimeType", "application/json"));
+    Map<String, Object> body =
+        Map.of(
+            "system_instruction", Map.of("parts", List.of(Map.of("text", systemPrompt))),
+            "contents", List.of(Map.of("parts", contentParts)),
+            "generationConfig",
+                Map.of("maxOutputTokens", 512, "responseMimeType", "application/json"));
 
     String bodyJson = objectMapper.writeValueAsString(body);
     Exception lastError = null;
@@ -245,14 +312,16 @@ public class AiChatController {
     for (String model : modelsToTry) {
       try {
         String url = GEMINI_BASE + model + ":generateContent?key=" + geminiApiKey;
-        HttpRequest httpRequest = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .header("Content-Type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(bodyJson))
-            .timeout(Duration.ofSeconds(20))
-            .build();
+        HttpRequest httpRequest =
+            HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(bodyJson))
+                .timeout(Duration.ofSeconds(20))
+                .build();
 
-        HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response =
+            httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() != 200) {
           LOGGER.warn("Gemini request failed: model={}, status={}", model, response.statusCode());
@@ -287,23 +356,31 @@ public class AiChatController {
       parsed = objectMapper.readValue(text, Map.class);
     } catch (Exception e) {
       LOGGER.warn("Gemini content is not valid JSON; returning plain text response", e);
-      return Map.of("text", text.isBlank()
-          ? "I’m here to help with deals, orders, or tickets. What would you like?"
-          : text, "intent", "unknown");
+      return Map.of(
+          "text",
+          text.isBlank()
+              ? "I’m here to help with deals, orders, or tickets. What would you like?"
+              : text,
+          "intent",
+          "unknown");
     }
 
-    String responseText = str(parsed.get("responseText"),
-        "I’m here to help with deals, orders, or tickets. What would you like?");
+    String responseText =
+        str(
+            parsed.get("responseText"),
+            "I’m here to help with deals, orders, or tickets. What would you like?");
     String intent = str(parsed.get("intent"), "unknown");
-    String navigateTo = parsed.get("navigateTo") != null ? String.valueOf(parsed.get("navigateTo")) : null;
+    String navigateTo =
+        parsed.get("navigateTo") != null ? String.valueOf(parsed.get("navigateTo")) : null;
 
     // Resolve recommended products
     List<Map<String, Object>> recommended = List.of();
     Object ids = parsed.get("recommendedProductIds");
     if (ids instanceof List<?> idList && !idList.isEmpty()) {
-      recommended = products.stream()
-          .filter(p -> p.get("id") != null && idList.contains(String.valueOf(p.get("id"))))
-          .toList();
+      recommended =
+          products.stream()
+              .filter(p -> p.get("id") != null && idList.contains(String.valueOf(p.get("id"))))
+              .toList();
     }
     if ("search_deals".equals(intent) && recommended.isEmpty() && !products.isEmpty()) {
       recommended = products.subList(0, Math.min(5, products.size()));
@@ -322,7 +399,15 @@ public class AiChatController {
     Object ev = parsed.get("extractedValues");
     if (ev instanceof Map<?, ?> evMap && !evMap.isEmpty()) {
       Map<String, String> cleaned = new LinkedHashMap<>();
-      for (String key : List.of("orderId", "amount", "orderDate", "seller", "productName", "paymentMethod", "platform")) {
+      for (String key :
+          List.of(
+              "orderId",
+              "amount",
+              "orderDate",
+              "seller",
+              "productName",
+              "paymentMethod",
+              "platform")) {
         Object val = evMap.get(key);
         if (val != null && !String.valueOf(val).isBlank()) {
           cleaned.put(key, String.valueOf(val).trim());
@@ -337,46 +422,59 @@ public class AiChatController {
   private String buildSystemPrompt(
       String userName, String deals, String orders, String tickets, boolean hasImage) {
     StringBuilder sb = new StringBuilder();
-    sb.append("You are 'BUZZMA', a world-class AI shopping strategist for ").append(userName).append(".\n\n");
+    sb.append("You are 'BUZZMA', a world-class AI shopping strategist for ")
+        .append(userName)
+        .append(".\n\n");
     sb.append("CONTEXT:\n");
     sb.append("- DEALS: ").append(deals).append("\n");
     sb.append("- RECENT ORDERS: ").append(orders).append("\n");
     sb.append("- TICKETS: ").append(tickets).append("\n\n");
     sb.append("BEHAVIOR:\n");
     sb.append("1. Be concise and friendly.\n");
-    sb.append("2. If user mentions deals or products, put matching IDs in 'recommendedProductIds'.\n");
-    sb.append("3. Classify intent: 'search_deals', 'check_order_status', 'check_ticket_status', 'navigation', 'greeting', or 'unknown'.\n");
+    sb.append(
+        "2. If user mentions deals or products, put matching IDs in 'recommendedProductIds'.\n");
+    sb.append(
+        "3. Classify intent: 'search_deals', 'check_order_status', 'check_ticket_status', 'navigation', 'greeting', or 'unknown'.\n");
     sb.append("4. For navigation, use: 'home', 'explore', 'orders', 'profile'.\n");
     sb.append("5. Use **bold** for key info like **₹599** or **Delivered**.\n");
-    sb.append("6. Always respond in JSON: { responseText, intent, navigateTo?, recommendedProductIds?, extractedValues? }\n");
+    sb.append(
+        "6. Always respond in JSON: { responseText, intent, navigateTo?, recommendedProductIds?, extractedValues? }\n");
     if (hasImage) {
-      sb.append("7. IMAGE ANALYSIS (HIGHEST PRIORITY): Extract orderId, amount, orderDate, seller, productName, paymentMethod, platform from the image into extractedValues. If you find an Order ID, start responseText with 'Found Order ID: **<ID>**'.\n");
+      sb.append(
+          "7. IMAGE ANALYSIS (HIGHEST PRIORITY): Extract orderId, amount, orderDate, seller, productName, paymentMethod, platform from the image into extractedValues. If you find an Order ID, start responseText with 'Found Order ID: **<ID>**'.\n");
     }
     return sb.toString();
   }
 
   private Map<String, Object> fallbackResponse() {
-    return Map.of("text",
+    return Map.of(
+        "text",
         "I’m here to help with deals, orders, or tickets. What would you like?",
-        "intent", "unknown");
+        "intent",
+        "unknown");
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 
-  private List<Map<String, Object>> resolveProducts(UUID actorId, List<Map<String, Object>> clientProducts) {
+  private List<Map<String, Object>> resolveProducts(
+      UUID actorId, List<Map<String, Object>> clientProducts) {
     if (clientProducts != null && !clientProducts.isEmpty()) return clientProducts;
     UsersEntity user = usersRepository.findById(actorId).orElse(null);
-    if (user == null || user.getParentCode() == null || user.getParentCode().isBlank()) return List.of();
-    List<DealsEntity> deals = dealsRepository
-        .findActiveProductsForMediator(user.getParentCode(), PageRequest.of(0, 50))
-        .getContent();
+    if (user == null || user.getParentCode() == null || user.getParentCode().isBlank())
+      return List.of();
+    List<DealsEntity> deals =
+        dealsRepository
+            .findActiveProductsForMediator(user.getParentCode(), PageRequest.of(0, 50))
+            .getContent();
     List<Map<String, Object>> result = new ArrayList<>();
     for (DealsEntity d : deals) {
       Map<String, Object> p = new LinkedHashMap<>();
       p.put("id", d.getId());
       p.put("title", d.getTitle());
       p.put("price", d.getPricePaise() != null ? d.getPricePaise() / 100.0 : 0);
-      p.put("originalPrice", d.getOriginalPricePaise() != null ? d.getOriginalPricePaise() / 100.0 : 0);
+      p.put(
+          "originalPrice",
+          d.getOriginalPricePaise() != null ? d.getOriginalPricePaise() / 100.0 : 0);
       p.put("platform", d.getPlatform());
       p.put("brandName", d.getBrandName());
       p.put("image", d.getImage());
@@ -401,7 +499,10 @@ public class AiChatController {
       int score = 0;
       for (String t : meaningful) if (title.contains(t)) score++;
       if (title.contains(String.join(" ", meaningful))) score += 3;
-      if (score > bestScore) { bestScore = score; best = p; }
+      if (score > bestScore) {
+        bestScore = score;
+        best = p;
+      }
     }
     return bestScore >= 2 ? best : null;
   }
@@ -416,7 +517,11 @@ public class AiChatController {
 
   private double toDouble(Object val) {
     if (val instanceof Number n) return n.doubleValue();
-    try { return Double.parseDouble(String.valueOf(val)); } catch (Exception e) { return 0; }
+    try {
+      return Double.parseDouble(String.valueOf(val));
+    } catch (Exception e) {
+      return 0;
+    }
   }
 
   private String str(Object val, String def) {
@@ -442,21 +547,26 @@ public class AiChatController {
     }
 
     if (geminiApiKey == null || geminiApiKey.isBlank()) {
-      return emptyExtraction("AI extraction is not configured. Please enter your order details manually.");
+      return emptyExtraction(
+          "AI extraction is not configured. Please enter your order details manually.");
     }
 
     try {
       return callGeminiExtract(request.imageBase64());
     } catch (Exception e) {
       LOGGER.error("Gemini extract-order failed for userId={}", actorId, e);
-      return emptyExtraction("Extraction encountered an issue: " + e.getMessage().substring(0, Math.min(200, e.getMessage().length())) + ". Please enter details manually.");
+      return emptyExtraction(
+          "Extraction encountered an issue: "
+              + e.getMessage().substring(0, Math.min(200, e.getMessage().length()))
+              + ". Please enter details manually.");
     }
   }
 
   private Map<String, Object> callGeminiExtract(String imageBase64) throws Exception {
     String imageData = imageBase64.contains(",") ? imageBase64.split(",", 2)[1] : imageBase64;
 
-    String prompt = """
+    String prompt =
+        """
         You are an OCR extraction assistant. Analyze this e-commerce order screenshot and extract the following fields.
         Return ONLY valid JSON with these exact keys (use null for any field you cannot find):
         {
@@ -472,15 +582,16 @@ public class AiChatController {
         Extract the FINAL PAID amount (not MRP/original price). For orderId, prefer platform-specific formats.
         """;
 
-    List<Map<String, Object>> parts = List.of(
-        Map.of("inlineData", Map.of("mimeType", "image/jpeg", "data", imageData)),
-        Map.of("text", prompt));
+    List<Map<String, Object>> parts =
+        List.of(
+            Map.of("inlineData", Map.of("mimeType", "image/jpeg", "data", imageData)),
+            Map.of("text", prompt));
 
-    Map<String, Object> body = Map.of(
-        "contents", List.of(Map.of("parts", parts)),
-        "generationConfig", Map.of(
-            "maxOutputTokens", 512,
-            "responseMimeType", "application/json"));
+    Map<String, Object> body =
+        Map.of(
+            "contents", List.of(Map.of("parts", parts)),
+            "generationConfig",
+                Map.of("maxOutputTokens", 512, "responseMimeType", "application/json"));
 
     String bodyJson = objectMapper.writeValueAsString(body);
     Exception lastError = null;
@@ -494,17 +605,20 @@ public class AiChatController {
     for (String model : modelsToTry) {
       try {
         String url = GEMINI_BASE + model + ":generateContent?key=" + geminiApiKey;
-        HttpRequest httpRequest = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .header("Content-Type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(bodyJson))
-            .timeout(Duration.ofSeconds(30))
-            .build();
+        HttpRequest httpRequest =
+            HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(bodyJson))
+                .timeout(Duration.ofSeconds(30))
+                .build();
 
-        HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response =
+            httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() != 200) {
-          LOGGER.warn("Gemini extract-order failed: model={}, status={}", model, response.statusCode());
+          LOGGER.warn(
+              "Gemini extract-order failed: model={}, status={}", model, response.statusCode());
           lastError = new RuntimeException("Gemini HTTP " + response.statusCode());
           continue;
         }
@@ -523,7 +637,8 @@ public class AiChatController {
     Map<String, Object> root = objectMapper.readValue(body, Map.class);
     List<Map<String, Object>> candidates = (List<Map<String, Object>>) root.get("candidates");
     if (candidates == null || candidates.isEmpty()) {
-      return emptyExtraction("Could not extract order details from the image. Please enter details manually.");
+      return emptyExtraction(
+          "Could not extract order details from the image. Please enter details manually.");
     }
     Map<String, Object> content = (Map<String, Object>) candidates.get(0).get("content");
     List<Map<String, Object>> parts = (List<Map<String, Object>>) content.get("parts");
@@ -552,7 +667,8 @@ public class AiChatController {
     result.put("confidenceScore", confidence);
 
     if (result.values().stream().filter(v -> v != null && !v.equals(0)).count() <= 1) {
-      result.put("notes", "Limited information extracted. Please verify and fill in missing details.");
+      result.put(
+          "notes", "Limited information extracted. Please verify and fill in missing details.");
     }
     return result;
   }

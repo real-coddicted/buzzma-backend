@@ -1,6 +1,5 @@
 package com.coddicted.buzzma.ops.service.impl;
 
-import com.coddicted.buzzma.ops.service.OpsService;
 import com.coddicted.buzzma.catalog.api.CampaignsResponseDto;
 import com.coddicted.buzzma.catalog.api.CatalogAdminPort;
 import com.coddicted.buzzma.catalog.api.CatalogQueryPort;
@@ -9,6 +8,7 @@ import com.coddicted.buzzma.identity.api.UserAdminPort;
 import com.coddicted.buzzma.identity.api.UserQueryPort;
 import com.coddicted.buzzma.identity.api.UsersResponseDto;
 import com.coddicted.buzzma.mediator.api.MediatorAdminPort;
+import com.coddicted.buzzma.ops.service.OpsService;
 import com.coddicted.buzzma.orders.api.OrderAdminPort;
 import com.coddicted.buzzma.orders.api.OrderQueryPort;
 import com.coddicted.buzzma.orders.api.OrdersResponseDto;
@@ -180,8 +180,10 @@ public class OpsServiceImpl implements OpsService {
 
   @Override
   @Transactional
-  public DealsResponseDto publishDeal(UUID campaignId, String mediatorCode, int commissionPaise, UUID actorUserId) {
-    DealsResponseDto saved = catalogAdminPort.publishDeal(campaignId, mediatorCode, commissionPaise, actorUserId);
+  public DealsResponseDto publishDeal(
+      UUID campaignId, String mediatorCode, int commissionPaise, UUID actorUserId) {
+    DealsResponseDto saved =
+        catalogAdminPort.publishDeal(campaignId, mediatorCode, commissionPaise, actorUserId);
     auditLogWriter.write(
         actorUserId,
         new String[] {"ops"},

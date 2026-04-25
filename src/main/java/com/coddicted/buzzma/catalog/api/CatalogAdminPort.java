@@ -30,7 +30,8 @@ public interface CatalogAdminPort {
 
   void assignSlots(UUID campaignId, Map<String, Object> assignments, UUID actorUserId);
 
-  DealsResponseDto publishDeal(UUID campaignId, String mediatorCode, int commissionPaise, UUID actorUserId);
+  DealsResponseDto publishDeal(
+      UUID campaignId, String mediatorCode, int commissionPaise, UUID actorUserId);
 
   void declineOffer(UUID dealId, UUID actorUserId);
 

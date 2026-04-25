@@ -18,4 +18,3 @@ public class RequestLoggingConfig {
     return registration;
   }
 }
-

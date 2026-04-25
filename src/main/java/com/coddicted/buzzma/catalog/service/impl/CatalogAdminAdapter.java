@@ -95,7 +95,10 @@ public class CatalogAdminAdapter implements CatalogAdminPort {
     Optional<UsersResponseDto> brand = userQueryPort.findById(resolvedBrandId);
     if (brand.isPresent()) {
       String name = brand.get().getName();
-      campaign.setBrandName(name != null && !name.isBlank() ? name : (brandNameFallback != null ? brandNameFallback : "Brand"));
+      campaign.setBrandName(
+          name != null && !name.isBlank()
+              ? name
+              : (brandNameFallback != null ? brandNameFallback : "Brand"));
     } else {
       campaign.setBrandName(brandNameFallback != null ? brandNameFallback : "Brand");
     }
@@ -250,7 +253,8 @@ public class CatalogAdminAdapter implements CatalogAdminPort {
 
   @Override
   @Transactional
-  public DealsResponseDto publishDeal(UUID campaignId, String mediatorCode, int commissionPaise, UUID actorUserId) {
+  public DealsResponseDto publishDeal(
+      UUID campaignId, String mediatorCode, int commissionPaise, UUID actorUserId) {
     CampaignsEntity campaign =
         campaignsRepository
             .findById(campaignId)

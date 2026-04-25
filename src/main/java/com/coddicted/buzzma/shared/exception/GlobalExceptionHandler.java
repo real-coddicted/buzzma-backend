@@ -79,10 +79,10 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler({
-      MissingRequestHeaderException.class,
-      MissingServletRequestParameterException.class,
-      MethodArgumentTypeMismatchException.class,
-      HttpMessageNotReadableException.class
+    MissingRequestHeaderException.class,
+    MissingServletRequestParameterException.class,
+    MethodArgumentTypeMismatchException.class,
+    HttpMessageNotReadableException.class
   })
   public ResponseEntity<Map<String, Object>> handleBadRequest(Exception ex) {
     LOGGER.warn("Bad request: {}", ex.getMessage());

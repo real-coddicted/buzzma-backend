@@ -75,7 +75,8 @@ public class CatalogQueryAdapter implements CatalogQueryPort {
 
   @Override
   @Transactional(readOnly = true)
-  public long countActiveCampaignsForAgency(String agencyCode, java.util.List<String> managerCodes) {
+  public long countActiveCampaignsForAgency(
+      String agencyCode, java.util.List<String> managerCodes) {
     return campaignsRepository.countActiveCampaignsForAgency(
         agencyCode, managerCodes == null ? new String[0] : managerCodes.toArray(new String[0]));
   }

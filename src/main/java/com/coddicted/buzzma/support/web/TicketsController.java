@@ -19,8 +19,8 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -103,10 +103,7 @@ public class TicketsController {
     }
 
     TicketsRequestDto dto =
-        TicketsRequestDto.builder()
-            .status(status)
-            .resolutionNote(request.resolutionNote())
-            .build();
+        TicketsRequestDto.builder().status(status).resolutionNote(request.resolutionNote()).build();
     return service.update(id, dto);
   }
 
@@ -135,9 +132,7 @@ public class TicketsController {
   public Map<String, Object> getComments(@PathVariable UUID id) {
     var pageable = PageRequest.of(0, 200, Sort.by(Sort.Direction.ASC, "createdAt"));
     var comments =
-        ticketCommentsRepository
-            .findAllByTicketIdAndIsDeletedFalse(id, pageable)
-            .stream()
+        ticketCommentsRepository.findAllByTicketIdAndIsDeletedFalse(id, pageable).stream()
             .map(
                 c ->
                     Map.of(
