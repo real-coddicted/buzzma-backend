@@ -9,6 +9,7 @@ import com.coddicted.buzzma.catalog.persistence.CampaignsEntity;
 import com.coddicted.buzzma.catalog.persistence.CampaignsRepository;
 import com.coddicted.buzzma.catalog.persistence.DealsEntity;
 import com.coddicted.buzzma.catalog.persistence.DealsRepository;
+import com.coddicted.buzzma.catalog.utils.CampaignsUtil;
 import com.coddicted.buzzma.identity.api.UserQueryPort;
 import com.coddicted.buzzma.identity.api.UsersResponseDto;
 import com.coddicted.buzzma.shared.enums.CampaignStatus;
@@ -116,27 +117,9 @@ public class CatalogAdminAdapter implements CatalogAdminPort {
             .filter(c -> !Boolean.TRUE.equals(c.getIsDeleted()))
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "CAMPAIGN_NOT_FOUND"));
 
-    CampaignsEntity copy = new CampaignsEntity();
-    copy.setBrandUserId(source.getBrandUserId());
-    copy.setBrandName(source.getBrandName());
-    copy.setTitle(source.getTitle() + " (copy)");
-    copy.setPlatform(source.getPlatform());
-    copy.setImage(source.getImage());
-    copy.setProductUrl(source.getProductUrl());
-    copy.setOriginalPricePaise(source.getOriginalPricePaise());
-    copy.setPricePaise(source.getPricePaise());
-    copy.setPayoutPaise(source.getPayoutPaise());
-    copy.setTotalSlots(source.getTotalSlots());
-    copy.setUsedSlots(0);
-    copy.setStatus(CampaignStatus.draft);
-    copy.setDealType(source.getDealType());
-    copy.setReturnWindowDays(source.getReturnWindowDays());
-    copy.setAllowedAgencyCodes(
-        source.getAllowedAgencyCodes() != null ? source.getAllowedAgencyCodes() : new String[0]);
-    copy.setCreatedBy(actorUserId);
-    copy.setUpdatedBy(actorUserId);
+    final CampaignsEntity copy = CampaignsUtil.copy(source, actorUserId);
 
-    CampaignsEntity saved = campaignsRepository.save(copy);
+    final CampaignsEntity saved = campaignsRepository.save(copy);
     return campaignsMapper.toResponse(saved);
   }
 
@@ -318,7 +301,7 @@ public class CatalogAdminAdapter implements CatalogAdminPort {
 
   @Override
   @Transactional(readOnly = true)
-  public CampaignStatus getCampaignStatus(UUID campaignId) {
+  public CampaignStatus getCampaignStatus(final UUID campaignId) {
     CampaignsEntity campaign =
         campaignsRepository
             .findById(campaignId)
