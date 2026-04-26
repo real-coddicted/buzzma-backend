@@ -33,7 +33,9 @@ class ModuleBoundaryTest {
           "identity",
           "admin",
           "notifications",
-          "shared");
+          "shared",
+          "ai",
+          "ops");
 
   /** Classes allowed to live directly at com.coddicted.buzzma root (outside any module). */
   private static final Set<String> ROOT_WHITELIST =
@@ -67,7 +69,7 @@ class ModuleBoundaryTest {
         .resideInAPackage("com.coddicted.buzzma..")
         .should(
             new com.tngtech.archunit.lang.ArchCondition<JavaClass>(
-                "reside in com.coddicted.buzzma.<module>.* where <module> is one of the 12 modules, or be whitelisted at com.coddicted.buzzma root") {
+                "reside in com.coddicted.buzzma.<module>.* where <module> is one of the known modules, or be whitelisted at com.coddicted.buzzma root") {
               @Override
               public void check(JavaClass item, com.tngtech.archunit.lang.ConditionEvents events) {
                 String fqn = item.getName();

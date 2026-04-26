@@ -88,9 +88,10 @@ public class OpsController {
   public Map<String, Object> copyCampaign(
       @RequestBody Map<String, Object> body, @CurrentUserId UUID actorUserId) {
     Object idVal = body.get("id");
-    if (idVal == null)
+    if (idVal == null) {
       throw new com.coddicted.buzzma.shared.exception.ApiException(
           org.springframework.http.HttpStatus.BAD_REQUEST, "MISSING_ID");
+    }
     UUID campaignId = UUID.fromString(String.valueOf(idVal));
     CampaignsResponseDto c = opsService.copyCampaign(campaignId, actorUserId);
 
@@ -147,9 +148,10 @@ public class OpsController {
   public Map<String, Object> assignSlotsFlat(
       @RequestBody Map<String, Object> body, @CurrentUserId UUID actorUserId) {
     Object idVal = body.get("id");
-    if (idVal == null)
+    if (idVal == null) {
       throw new com.coddicted.buzzma.shared.exception.ApiException(
           org.springframework.http.HttpStatus.BAD_REQUEST, "MISSING_ID");
+    }
     UUID campaignId = UUID.fromString(String.valueOf(idVal));
 
     @SuppressWarnings("unchecked")
@@ -175,8 +177,12 @@ public class OpsController {
 
   @SuppressWarnings("unchecked")
   private String resolveCode(String paramCode, UUID actorId) {
-    if (paramCode != null && !paramCode.isBlank()) return paramCode;
-    if (actorId == null) return null;
+    if (paramCode != null && !paramCode.isBlank()) {
+      return paramCode;
+    }
+    if (actorId == null) {
+      return null;
+    }
     return usersRepository
         .findById(actorId)
         .map(u -> u.getMediatorCode() != null ? u.getMediatorCode() : u.getParentCode())
@@ -657,7 +663,9 @@ public class OpsController {
           prefix
               + "-"
               + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
-      if (!invitesRepository.existsByCode(candidate)) return candidate;
+      if (!invitesRepository.existsByCode(candidate)) {
+        return candidate;
+      }
     }
     throw new ApiException(
         org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR, "CODE_GENERATION_FAILED");
@@ -696,22 +704,30 @@ public class OpsController {
       String brandName) {
 
     int resolvedOriginalPricePaise() {
-      if (originalPricePaise != null) return originalPricePaise;
+      if (originalPricePaise != null) {
+        return originalPricePaise;
+      }
       return originalPrice != null ? (int) Math.round(originalPrice * 100) : 0;
     }
 
     int resolvedPricePaise() {
-      if (pricePaise != null) return pricePaise;
+      if (pricePaise != null) {
+        return pricePaise;
+      }
       return price != null ? (int) Math.round(price * 100) : 0;
     }
 
     int resolvedPayoutPaise() {
-      if (payoutPaise != null) return payoutPaise;
+      if (payoutPaise != null) {
+        return payoutPaise;
+      }
       return payout != null ? (int) Math.round(payout * 100) : 0;
     }
 
     String[] resolvedAllowedAgencyCodes() {
-      if (allowedAgencyCodes != null) return allowedAgencyCodes;
+      if (allowedAgencyCodes != null) {
+        return allowedAgencyCodes;
+      }
       return allowedAgencies != null ? allowedAgencies : new String[0];
     }
   }

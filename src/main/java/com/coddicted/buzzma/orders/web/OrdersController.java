@@ -118,9 +118,13 @@ public class OrdersController {
     List<String> requiredSteps = new ArrayList<>();
     requiredSteps.add("returnWindow");
     List<String> missingProofs = new ArrayList<>();
-    if (o.getScreenshotReturnWindow() == null) missingProofs.add("returnWindow");
+    if (o.getScreenshotReturnWindow() == null) {
+      missingProofs.add("returnWindow");
+    }
     List<String> missingVerifications = new ArrayList<>();
-    if (!returnWindowVerified) missingVerifications.add("returnWindow");
+    if (!returnWindowVerified) {
+      missingVerifications.add("returnWindow");
+    }
 
     Map<String, Object> requirements = new LinkedHashMap<>();
     requirements.put("required", requiredSteps);

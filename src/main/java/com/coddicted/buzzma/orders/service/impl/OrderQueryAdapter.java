@@ -69,14 +69,18 @@ public class OrderQueryAdapter implements OrderQueryPort {
   @Override
   @Transactional(readOnly = true)
   public long sumTotalPaiseByManagerNames(List<String> managerNames) {
-    if (managerNames == null || managerNames.isEmpty()) return 0L;
+    if (managerNames == null || managerNames.isEmpty()) {
+      return 0L;
+    }
     return ordersRepository.sumTotalPaiseByManagerNames(managerNames.toArray(new String[0]));
   }
 
   @Override
   @Transactional(readOnly = true)
   public long countByManagerNamesAndCreatedAtAfter(List<String> managerNames, Instant since) {
-    if (managerNames == null || managerNames.isEmpty()) return 0L;
+    if (managerNames == null || managerNames.isEmpty()) {
+      return 0L;
+    }
     return ordersRepository.countByManagerNamesAndCreatedAtAfter(
         managerNames.toArray(new String[0]), since);
   }
@@ -85,7 +89,9 @@ public class OrderQueryAdapter implements OrderQueryPort {
   @Transactional(readOnly = true)
   public List<Map<String, Object>> findDailyRevenue(
       List<String> managerNames, Instant start, Instant end) {
-    if (managerNames == null || managerNames.isEmpty()) return List.of();
+    if (managerNames == null || managerNames.isEmpty()) {
+      return List.of();
+    }
     return ordersRepository
         .findDailyRevenue(managerNames.toArray(new String[0]), start, end)
         .stream()
@@ -102,7 +108,9 @@ public class OrderQueryAdapter implements OrderQueryPort {
   @Override
   @Transactional(readOnly = true)
   public List<Map<String, Object>> findTopBrandsByOrderCount(List<String> managerNames) {
-    if (managerNames == null || managerNames.isEmpty()) return List.of();
+    if (managerNames == null || managerNames.isEmpty()) {
+      return List.of();
+    }
     return ordersRepository.findTopBrandsByOrderCount(managerNames.toArray(new String[0])).stream()
         .map(
             row -> {

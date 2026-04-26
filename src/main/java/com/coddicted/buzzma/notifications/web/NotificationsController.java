@@ -50,7 +50,9 @@ public class NotificationsController {
   @PreAuthorize("isAuthenticated()")
   public List<Map<String, Object>> list(@CurrentUserId UUID actorId) {
     UsersEntity user = usersRepository.findById(actorId).orElse(null);
-    if (user == null) return List.of();
+    if (user == null) {
+      return List.of();
+    }
 
     List<String> roles = user.getRoles() != null ? Arrays.asList(user.getRoles()) : List.of();
     boolean isShopper = roles.contains("shopper");
@@ -128,9 +130,12 @@ public class NotificationsController {
         if (orderVerified) {
           List<String> missingSteps = new ArrayList<>();
           if (o.getScreenshotReview() == null
-              && (o.getReviewLink() == null || o.getReviewLink().isBlank()))
+              && (o.getReviewLink() == null || o.getReviewLink().isBlank())) {
             missingSteps.add("review");
-          if (o.getScreenshotRating() == null) missingSteps.add("rating");
+          }
+          if (o.getScreenshotRating() == null) {
+            missingSteps.add("rating");
+          }
           if (!missingSteps.isEmpty()) {
             String label = missingSteps.size() >= 2 ? "review & rating" : missingSteps.get(0);
             notifications.add(
@@ -350,7 +355,9 @@ public class NotificationsController {
     if (actionLabel != null) {
       Map<String, Object> action = new LinkedHashMap<>();
       action.put("label", actionLabel);
-      if (actionHref != null) action.put("href", actionHref);
+      if (actionHref != null) {
+        action.put("href", actionHref);
+      }
       n.put("action", action);
     }
     return n;
@@ -358,20 +365,24 @@ public class NotificationsController {
 
   private String safeOrderShortId(OrdersEntity o) {
     String external = o.getExternalOrderId() != null ? o.getExternalOrderId().trim() : "";
-    if (!external.isEmpty())
+    if (!external.isEmpty()) {
       return external.length() > 20 ? external.substring(external.length() - 20) : external;
+    }
     String id = o.getId().toString();
     return id.length() > 6 ? id.substring(id.length() - 6) : id;
   }
 
   @SuppressWarnings("unchecked")
   private List<String> parseMissingProofTypes(String json) {
-    if (json == null || json.isBlank() || json.equals("[]")) return List.of();
+    if (json == null || json.isBlank() || json.equals("[]")) {
+      return List.of();
+    }
     List<String> result = new ArrayList<>();
-    // Simple parse: find "type":"review" or "type":"rating" occurrences
     String[] candidates = {"review", "rating"};
     for (String c : candidates) {
-      if (json.contains("\"" + c + "\"")) result.add(c);
+      if (json.contains("\"" + c + "\"")) {
+        result.add(c);
+      }
     }
     return result;
   }

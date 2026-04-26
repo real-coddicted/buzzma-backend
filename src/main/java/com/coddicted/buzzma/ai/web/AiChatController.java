@@ -243,7 +243,9 @@ public class AiChatController {
             ? request.userName().replaceAll("[\n\r\t{}\\[\\]<>]", "").strip()
             : "Guest";
     String userName = rawUserName.substring(0, Math.min(60, rawUserName.length()));
-    if (userName.isBlank()) userName = "Guest";
+    if (userName.isBlank()) {
+      userName = "Guest";
+    }
 
     // Build deal context (up to 10 products)
     StringBuilder dealContext = new StringBuilder();
@@ -306,7 +308,9 @@ public class AiChatController {
     List<String> modelsToTry = new ArrayList<>();
     modelsToTry.add(geminiModel);
     for (String m : MODEL_FALLBACKS) {
-      if (!m.equals(geminiModel)) modelsToTry.add(m);
+      if (!m.equals(geminiModel)) {
+        modelsToTry.add(m);
+      }
     }
 
     for (String model : modelsToTry) {
@@ -389,7 +393,9 @@ public class AiChatController {
     Map<String, Object> result = new LinkedHashMap<>();
     result.put("text", responseText);
     result.put("intent", intent);
-    if (navigateTo != null) result.put("navigateTo", navigateTo);
+    if (navigateTo != null) {
+      result.put("navigateTo", navigateTo);
+    }
     if (!recommended.isEmpty()) {
       result.put("uiType", "product_card");
       result.put("data", recommended);
@@ -413,7 +419,9 @@ public class AiChatController {
           cleaned.put(key, String.valueOf(val).trim());
         }
       }
-      if (!cleaned.isEmpty()) result.put("extractedValues", cleaned);
+      if (!cleaned.isEmpty()) {
+        result.put("extractedValues", cleaned);
+      }
     }
 
     return result;
@@ -458,10 +466,13 @@ public class AiChatController {
 
   private List<Map<String, Object>> resolveProducts(
       UUID actorId, List<Map<String, Object>> clientProducts) {
-    if (clientProducts != null && !clientProducts.isEmpty()) return clientProducts;
+    if (clientProducts != null && !clientProducts.isEmpty()) {
+      return clientProducts;
+    }
     UsersEntity user = usersRepository.findById(actorId).orElse(null);
-    if (user == null || user.getParentCode() == null || user.getParentCode().isBlank())
+    if (user == null || user.getParentCode() == null || user.getParentCode().isBlank()) {
       return List.of();
+    }
     List<DealsEntity> deals =
         dealsRepository
             .findActiveProductsForMediator(user.getParentCode(), PageRequest.of(0, 50))
@@ -490,15 +501,27 @@ public class AiChatController {
   private Map<String, Object> findBestMatch(List<Map<String, Object>> products, String msg) {
     String[] tokens = msg.replaceAll("[^a-z0-9\\s]", " ").split("\\s+");
     List<String> meaningful = new ArrayList<>();
-    for (String t : tokens) if (t.length() > 3) meaningful.add(t);
-    if (meaningful.isEmpty()) return null;
+    for (String t : tokens) {
+      if (t.length() > 3) {
+        meaningful.add(t);
+      }
+    }
+    if (meaningful.isEmpty()) {
+      return null;
+    }
     Map<String, Object> best = null;
     int bestScore = 0;
     for (Map<String, Object> p : products) {
       String title = String.valueOf(p.getOrDefault("title", "")).toLowerCase();
       int score = 0;
-      for (String t : meaningful) if (title.contains(t)) score++;
-      if (title.contains(String.join(" ", meaningful))) score += 3;
+      for (String t : meaningful) {
+        if (title.contains(t)) {
+          score++;
+        }
+      }
+      if (title.contains(String.join(" ", meaningful))) {
+        score += 3;
+      }
       if (score > bestScore) {
         bestScore = score;
         best = p;
@@ -509,14 +532,20 @@ public class AiChatController {
 
   private int extractCount(String msg) {
     java.util.regex.Matcher m = java.util.regex.Pattern.compile("top\\s+(\\d{1,2})").matcher(msg);
-    if (m.find()) return Math.max(1, Math.min(50, Integer.parseInt(m.group(1))));
+    if (m.find()) {
+      return Math.max(1, Math.min(50, Integer.parseInt(m.group(1))));
+    }
     m = java.util.regex.Pattern.compile("(\\d{1,2})\\s+deals").matcher(msg);
-    if (m.find()) return Math.max(1, Math.min(50, Integer.parseInt(m.group(1))));
+    if (m.find()) {
+      return Math.max(1, Math.min(50, Integer.parseInt(m.group(1))));
+    }
     return 0;
   }
 
   private double toDouble(Object val) {
-    if (val instanceof Number n) return n.doubleValue();
+    if (val instanceof Number n) {
+      return n.doubleValue();
+    }
     try {
       return Double.parseDouble(String.valueOf(val));
     } catch (Exception e) {
@@ -525,7 +554,9 @@ public class AiChatController {
   }
 
   private String str(Object val, String def) {
-    if (val == null) return def;
+    if (val == null) {
+      return def;
+    }
     String s = String.valueOf(val).trim();
     return s.isEmpty() ? def : s;
   }
@@ -599,7 +630,9 @@ public class AiChatController {
     List<String> modelsToTry = new ArrayList<>();
     modelsToTry.add(geminiModel);
     for (String m : MODEL_FALLBACKS) {
-      if (!m.equals(geminiModel)) modelsToTry.add(m);
+      if (!m.equals(geminiModel)) {
+        modelsToTry.add(m);
+      }
     }
 
     for (String model : modelsToTry) {
@@ -663,7 +696,9 @@ public class AiChatController {
 
     Object cs = parsed.get("confidenceScore");
     int confidence = 0;
-    if (cs instanceof Number n) confidence = n.intValue();
+    if (cs instanceof Number n) {
+      confidence = n.intValue();
+    }
     result.put("confidenceScore", confidence);
 
     if (result.values().stream().filter(v -> v != null && !v.equals(0)).count() <= 1) {
